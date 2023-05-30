@@ -1,0 +1,204 @@
+<div class="transit-result__list">
+ <div class="transit-result__list__container">
+  <h3 class="travel-list-header">
+   <span class="travel-list-header__label">
+    Mandag 5. juni
+   </span>
+  </h3>
+  <ul>
+   <li aria-label="Fra Oslo S. klokken 12:03. tog f4 vy. Billettpris 1096 kroner. Framme klokken 19:06. Trykk for detaljer" class="transit-result-item transit-result__list__item" role="button" tabindex="0">
+    <div class="transit-result-item__content">
+     <h2 class="transit-result-item__header">
+      <span class="transit-result-item__header__name">
+       Fra Oslo S
+      </span>
+      <span aria-label="7 timer og 3 minutter" class="transit-result-item__header__duration">
+       7 t 3 min
+      </span>
+     </h2>
+     <div class="trip-pattern-list">
+      <div class="legs-list">
+       <ul class="legs-list__legs">
+        <li class="legs-list__leg">
+         <div class="legs-list__leg__details">
+          <div class="travel-tag" style="background-color: rgb(0, 54, 127);">
+           <svg class="eds-icon eds-icon__train travel-tag__icon travel-tag__icon--default" color="#00367f" height="1em" role="presentation" viewbox="0 0 16 16" width="1em">
+            <path clip-rule="evenodd" d="M1 12h13v1H1z" fill="#00367F" fill-rule="evenodd">
+            </path>
+            <path d="M14.75 8.1a.623.623 0 00-.091-.11l-.035-.036a5.537 5.537 0 01-.093-.095c-.315-.314-2.34-1.805-3.436-2.528-.358-.236-.76-.331-.999-.331h-3.54l1.295-.89c.1-.076.149-.134.149-.256a.332.332 0 00-.142-.276L6.364 2.399H5.4l1.702 1.434-1.7 1.166h.001H1v6h12.612c.196 0 .38-.098.488-.263.49-.755.9-1.41.9-1.902 0-.277-.095-.529-.25-.735zm-2.537-.508c-.046.136-.173.172-.317.172h-.666c-.071 0-.185.01-.284-.063l-.95-.671a.332.332 0 01.2-.599h.666c.072 0 .142.024.2.068l1.034.778c.115.086.162.18.117.315z" fill="#00367F">
+            </path>
+           </svg>
+           <span class="travel-tag__label travel-tag__label--margin">
+            F4 Bergen
+           </span>
+          </div>
+          <div class="eds-leg-line legs-list__leg__connector eds-leg-line--line eds-leg-line--horizontal" style="background-color: rgb(243, 243, 243);">
+          </div>
+         </div>
+         <div class="legs-list__leg__time">
+          <time class="legs-list__leg__time__time" datetime="2023-06-05T12:03:00+02:00">
+           12:03
+          </time>
+         </div>
+        </li>
+       </ul>
+      </div>
+      <div class="trip-pattern-list__destination">
+       <div class="travel-tag travel-tag--non-transit">
+        <svg class="eds-icon travel-tag__icon travel-tag__icon--non-transit" color="currentColor" height="1em" role="presentation" viewbox="0 0 12 14" width="1em">
+         <path clip-rule="evenodd" d="M11.243 0c.496 0 .807.516.606.946l-.047.084L9.71 4.244l2.092 3.216a.667.667 0 01-.463 1.023l-.096.007h-9.81V14H.1V.667C.1.329.35.05.676.007L.766 0h10.477zm-1.23 1.333h-8.58v5.823h8.581L8.356 4.61a.667.667 0 01-.047-.642l.047-.086 1.657-2.548z" fill="currentColor" fill-rule="evenodd">
+         </path>
+        </svg>
+       </div>
+       <time class="trip-pattern-list__time">
+        19:06
+       </time>
+      </div>
+     </div>
+    </div>
+    <div class="transit-result-item__footer">
+     <span class="transit-result-item__footer__text">
+      Voksen 1096,-
+     </span>
+     <span class="transit-result-item__footer__text">
+      Vis detaljer
+      <svg class="eds-icon transit-result-item__footer__text__details-icon eds-icon--inline" color="currentColor" height="1em" viewbox="0 0 16 16" width="1em">
+       <path clip-rule="evenodd" d="M5.943 2.5L5 3.443l4.291 4.29L5 12.023l.943.944 4.762-4.762a.667.667 0 00.07-.86l-.07-.083L5.943 2.5z" fill="currentColor" fill-rule="evenodd">
+       </path>
+      </svg>
+     </span>
+    </div>
+   </li>
+   <li aria-label="Fra Oslo S. klokken 16:25. tog f4 vy. Billettpris 659 kroner. Framme klokken 23:18. Trykk for detaljer" class="transit-result-item transit-result__list__item" role="button" tabindex="0">
+    <div class="transit-result-item__content">
+     <h2 class="transit-result-item__header">
+      <span class="transit-result-item__header__name">
+       Fra Oslo S
+      </span>
+      <span aria-label="6 timer og 53 minutter" class="transit-result-item__header__duration">
+       6 t 53 min
+      </span>
+     </h2>
+     <div class="trip-pattern-list">
+      <div class="legs-list">
+       <ul class="legs-list__legs">
+        <li class="legs-list__leg">
+         <div class="legs-list__leg__details">
+          <div class="travel-tag" style="background-color: rgb(0, 54, 127);">
+           <svg class="eds-icon eds-icon__train travel-tag__icon travel-tag__icon--default" color="#00367f" height="1em" role="presentation" viewbox="0 0 16 16" width="1em">
+            <path clip-rule="evenodd" d="M1 12h13v1H1z" fill="#00367F" fill-rule="evenodd">
+            </path>
+            <path d="M14.75 8.1a.623.623 0 00-.091-.11l-.035-.036a5.537 5.537 0 01-.093-.095c-.315-.314-2.34-1.805-3.436-2.528-.358-.236-.76-.331-.999-.331h-3.54l1.295-.89c.1-.076.149-.134.149-.256a.332.332 0 00-.142-.276L6.364 2.399H5.4l1.702 1.434-1.7 1.166h.001H1v6h12.612c.196 0 .38-.098.488-.263.49-.755.9-1.41.9-1.902 0-.277-.095-.529-.25-.735zm-2.537-.508c-.046.136-.173.172-.317.172h-.666c-.071 0-.185.01-.284-.063l-.95-.671a.332.332 0 01.2-.599h.666c.072 0 .142.024.2.068l1.034.778c.115.086.162.18.117.315z" fill="#00367F">
+            </path>
+           </svg>
+           <span class="travel-tag__label travel-tag__label--margin">
+            F4 Bergen
+           </span>
+          </div>
+          <div class="eds-leg-line legs-list__leg__connector eds-leg-line--line eds-leg-line--horizontal" style="background-color: rgb(243, 243, 243);">
+          </div>
+         </div>
+         <div class="legs-list__leg__time">
+          <time class="legs-list__leg__time__time" datetime="2023-06-05T16:25:00+02:00">
+           16:25
+          </time>
+         </div>
+        </li>
+       </ul>
+      </div>
+      <div class="trip-pattern-list__destination">
+       <div class="travel-tag travel-tag--non-transit">
+        <svg class="eds-icon travel-tag__icon travel-tag__icon--non-transit" color="currentColor" height="1em" role="presentation" viewbox="0 0 12 14" width="1em">
+         <path clip-rule="evenodd" d="M11.243 0c.496 0 .807.516.606.946l-.047.084L9.71 4.244l2.092 3.216a.667.667 0 01-.463 1.023l-.096.007h-9.81V14H.1V.667C.1.329.35.05.676.007L.766 0h10.477zm-1.23 1.333h-8.58v5.823h8.581L8.356 4.61a.667.667 0 01-.047-.642l.047-.086 1.657-2.548z" fill="currentColor" fill-rule="evenodd">
+         </path>
+        </svg>
+       </div>
+       <time class="trip-pattern-list__time">
+        23:18
+       </time>
+      </div>
+     </div>
+    </div>
+    <div class="transit-result-item__footer">
+     <span class="transit-result-item__footer__text">
+      Voksen 659,-
+     </span>
+     <span class="transit-result-item__footer__text">
+      Vis detaljer
+      <svg class="eds-icon transit-result-item__footer__text__details-icon eds-icon--inline" color="currentColor" height="1em" viewbox="0 0 16 16" width="1em">
+       <path clip-rule="evenodd" d="M5.943 2.5L5 3.443l4.291 4.29L5 12.023l.943.944 4.762-4.762a.667.667 0 00.07-.86l-.07-.083L5.943 2.5z" fill="currentColor" fill-rule="evenodd">
+       </path>
+      </svg>
+     </span>
+    </div>
+   </li>
+   <li aria-label="Fra Oslo S. klokken 23:03. tog f4 vy. Billettpris 739 kroner. Framme klokken 06:44. Trykk for detaljer" class="transit-result-item transit-result__list__item" role="button" tabindex="0">
+    <div class="transit-result-item__content">
+     <h2 class="transit-result-item__header">
+      <span class="transit-result-item__header__name">
+       Fra Oslo S
+      </span>
+      <span aria-label="7 timer og 41 minutter" class="transit-result-item__header__duration">
+       7 t 41 min
+      </span>
+     </h2>
+     <div class="trip-pattern-list">
+      <div class="legs-list">
+       <ul class="legs-list__legs">
+        <li class="legs-list__leg">
+         <div class="legs-list__leg__details">
+          <div class="travel-tag" style="background-color: rgb(0, 54, 127);">
+           <svg class="eds-icon eds-icon__train travel-tag__icon travel-tag__icon--default" color="#00367f" height="1em" role="presentation" viewbox="0 0 16 16" width="1em">
+            <path clip-rule="evenodd" d="M1 12h13v1H1z" fill="#00367F" fill-rule="evenodd">
+            </path>
+            <path d="M14.75 8.1a.623.623 0 00-.091-.11l-.035-.036a5.537 5.537 0 01-.093-.095c-.315-.314-2.34-1.805-3.436-2.528-.358-.236-.76-.331-.999-.331h-3.54l1.295-.89c.1-.076.149-.134.149-.256a.332.332 0 00-.142-.276L6.364 2.399H5.4l1.702 1.434-1.7 1.166h.001H1v6h12.612c.196 0 .38-.098.488-.263.49-.755.9-1.41.9-1.902 0-.277-.095-.529-.25-.735zm-2.537-.508c-.046.136-.173.172-.317.172h-.666c-.071 0-.185.01-.284-.063l-.95-.671a.332.332 0 01.2-.599h.666c.072 0 .142.024.2.068l1.034.778c.115.086.162.18.117.315z" fill="#00367F">
+            </path>
+           </svg>
+           <span class="travel-tag__label travel-tag__label--margin">
+            F4 Bergen
+           </span>
+          </div>
+          <div class="eds-leg-line legs-list__leg__connector eds-leg-line--line eds-leg-line--horizontal" style="background-color: rgb(243, 243, 243);">
+          </div>
+         </div>
+         <div class="legs-list__leg__time">
+          <time class="legs-list__leg__time__time" datetime="2023-06-05T23:03:00+02:00">
+           23:03
+          </time>
+          <svg class="eds-icon legs-list__leg__night-rail" color="currentColor" height="12" size="12" viewbox="0 0 16 16" width="12">
+           <path clip-rule="evenodd" d="M6.961 1.016a6.895 6.895 0 00-3.42 1.9C.82 5.68.82 10.163 3.54 12.927s7.131 2.765 9.852 0c.384-.39.72-.83 1.013-1.316.288-.478-.13-1.074-.669-.953a5.643 5.643 0 01-5.276-1.558c-1.876-1.906-2.199-4.858-.83-7.13.287-.478-.13-1.074-.67-.953zm-1.057 1.72l-.055.171c-.746 2.45-.14 5.195 1.726 7.092l.185.18a6.88 6.88 0 004.507 1.885l.199.002.04-.04c-2.23 2.268-5.848 2.268-8.08 0s-2.231-5.943 0-8.21a5.675 5.675 0 011.297-.986l.181-.095z" fill="currentColor" fill-rule="evenodd">
+           </path>
+          </svg>
+         </div>
+        </li>
+       </ul>
+      </div>
+      <div class="trip-pattern-list__destination">
+       <div class="travel-tag travel-tag--non-transit">
+        <svg class="eds-icon travel-tag__icon travel-tag__icon--non-transit" color="currentColor" height="1em" role="presentation" viewbox="0 0 12 14" width="1em">
+         <path clip-rule="evenodd" d="M11.243 0c.496 0 .807.516.606.946l-.047.084L9.71 4.244l2.092 3.216a.667.667 0 01-.463 1.023l-.096.007h-9.81V14H.1V.667C.1.329.35.05.676.007L.766 0h10.477zm-1.23 1.333h-8.58v5.823h8.581L8.356 4.61a.667.667 0 01-.047-.642l.047-.086 1.657-2.548z" fill="currentColor" fill-rule="evenodd">
+         </path>
+        </svg>
+       </div>
+       <time class="trip-pattern-list__time">
+        06:44
+       </time>
+      </div>
+     </div>
+    </div>
+    <div class="transit-result-item__footer">
+     <span class="transit-result-item__footer__text">
+      Voksen 739,-
+     </span>
+     <span class="transit-result-item__footer__text">
+      Vis detaljer
+      <svg class="eds-icon transit-result-item__footer__text__details-icon eds-icon--inline" color="currentColor" height="1em" viewbox="0 0 16 16" width="1em">
+       <path clip-rule="evenodd" d="M5.943 2.5L5 3.443l4.291 4.29L5 12.023l.943.944 4.762-4.762a.667.667 0 00.07-.86l-.07-.083L5.943 2.5z" fill="currentColor" fill-rule="evenodd">
+       </path>
+      </svg>
+     </span>
+    </div>
+   </li>
+  </ul>
+ </div>
+</div>
