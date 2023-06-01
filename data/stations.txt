@@ -1,0 +1,22 @@
+commonname,id,label,lat,lot
+"Bergen","NSR%3AStopPlace%3A59983","Bergen%20stasjon","60.390434","5.333511"
+"Bergen Buss",NSR%3AStopPlace%3A62356","Bergen%20busstasjon","60.388106","5.334608
+"Arna","NSR%3AStopPlace%3A398","Arna%20stasjon","60.420097","5.46609"
+"Trengereid","NSR%3AStopPlace%3A60042","Trengereid%20stasjon","60.429023","5.624319
+"Dale","NSR%3AStopPlace%3A58926","Dale%20stasjon","60.586373","5.815646
+"Voss","NSR%3AStopPlace%3A59958","Voss%20stasjon","60.62893","6.410571"
+"Myrdal","NSR%3AStopPlace%3A222","Myrdal%20stasjon","60.735141","7.122762"
+"Flåm","NSR%3AStopPlace%3A58927","Fl%C3%A5m%20stasjon","60.863176","7.114409"
+"Hallingskeid","NSR%3AStopPlace%3A71","Hallingskeid%20stasjon","60.667918","7.252248"
+"Finse","NSR%3AStopPlace%3A200","Finse%20stasjon","60.601772","7.503823"
+"Geilo","NSR%3AStopPlace%3A58832","Geilo%20stasjon","60.534504","8.206747"
+"Oslo S","NSR%3AStopPlace%3A59872","Oslo%20S","59.910357","10.753051"
+"Oslo Lufthavn","NSR%3AStopPlace%3A58211","Oslo%20lufthavn","60.193361","11.097887
+"Stavanger","NSR%3AStopPlace%3A61291","Stavanger%20stasjon","58.966568","5.732616"
+"Kristiansand","NSR%3AStopPlace%3A61608","Kristiansand%20stasjon","58.14559","7.988067"
+"Trondheim","NSR%3AStopPlace%3A59977","Trondheim%20S","63.436279","10.399123"
+"Göteborg","NSR%3AStopPlace%3A374","G%C3%B6teborg%20Centralstation","57.709156","11.972901"
+"Bodø","NSR%3AStopPlace%3A58952","Bod%C3%B8%20stasjon","67.286621","14.390518
+"Åndalsnes","NSR%3AStopPlace%3A59703","%C3%85ndalsnes%20stasjon","62.567422","7.690242
+"Dombås","NSR%3AStopPlace%3A58816","Domb%C3%A5s%20stasjon","62.069056","9.125653
+"Røros","NSR%3AStopPlace%3A53","R%C3%B8ros%20stasjon","62.574745","11.379087
