@@ -17,14 +17,30 @@ def fetch_website(url):
 	return content
 
 def get_transit_container(html_content):
-	soup = BeautifulSoup(html_content, 'html.parser')
-	container = soup.find('div', class_='transit-result__list')
+	soup = BeautifulSoup(html_content, "html.parser")
+	container = soup.find("div", class_="transit-result__list")
 
 	if container:
 		return container
 	else:
 		print("Container not found.")
 		exit(0)
+
+def get_trains_from_html(html_content):
+	date = html_content.find("span", class_="travel-list-header__label").get_text().strip()
+	connections_ul = html_content.find("ul")
+	connection_items = connections_ul.findAll(class_= "transit-result-item transit-result__list__item")
+
+	for connection in connection_items:
+		station_from = connection.find("span", class_="transit-result-item__header__name").get_text().strip()
+		duration = connection.find("span", class_="transit-result-item__header__duration").get_text().strip()
+		line_name = connection.find("span", class_="travel-tag__label travel-tag__label--margin").get_text().strip()
+		time_departure = connection.find("time", class_="legs-list__leg__time__time").get_text().strip()
+		time_arrival = connection.find("time", class_="trip-pattern-list__time").get_text().strip()
+		price = connection.find("span", class_="transit-result-item__footer__text").get_text().strip()
+		
+		print(connection["aria-label"])
+		print(f"{line_name} from {station_from} from {time_departure} to {time_arrival} ({duration}) for {price}")
 
 def read_html_file(file_path):
 	with open(file_path, "r") as file:
@@ -61,7 +77,7 @@ def read_stations(file_path):
 	return data_dict
 
 def convert_to_unix_time(year, month, day, hour, minute):
-	oslo_timezone = pytz.timezone('Europe/Oslo')
+	oslo_timezone = pytz.timezone("Europe/Oslo")
 	oslo_datetime = oslo_timezone.localize(datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute))
 	unix_time = int(oslo_datetime.timestamp())
 	return unix_time
@@ -71,18 +87,21 @@ def main():
 	debug = True
 
 	# Stations
-	station_dict = read_stations("data/stations.txt")
+	station_dict = read_stations("./data/stations.txt")
 	
 	if debug:
-		content = read_html_file("./debug/example_html.txt")
+		content = read_html_file("./debug/example_html.html")
 	else:
 		url = generate_url(date = convert_to_unix_time(2023, 7, 13, 18, 0), station_from=station_dict["Bergen"], station_to=station_dict["Myrdal"])
 		content = fetch_website(url)
 
 	# Mine content
 	transit_data = get_transit_container(content)
-	prettified_content = transit_data.prettify()
-	print(prettified_content)
+	train_data = get_trains_from_html(transit_data)
+
+	# Output
+	#prettified_content = train_data.prettify()
+	#print(prettified_content)
 
 	
 
