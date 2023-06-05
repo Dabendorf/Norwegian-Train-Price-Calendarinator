@@ -27,20 +27,32 @@ def get_transit_container(html_content):
 		exit(0)
 
 def get_trains_from_html(html_content):
-	date = html_content.find("span", class_="travel-list-header__label").get_text().strip()
-	connections_ul = html_content.find("ul")
-	connection_items = connections_ul.findAll(class_= "transit-result-item transit-result__list__item")
+	day_container = html_content.findAll(class_ = "transit-result__list__container") # Each container for a single day, containing all connections
 
-	for connection in connection_items:
-		station_from = connection.find("span", class_="transit-result-item__header__name").get_text().strip()
-		duration = connection.find("span", class_="transit-result-item__header__duration").get_text().strip()
-		line_name = connection.find("span", class_="travel-tag__label travel-tag__label--margin").get_text().strip()
-		time_departure = connection.find("time", class_="legs-list__leg__time__time").get_text().strip()
-		time_arrival = connection.find("time", class_="trip-pattern-list__time").get_text().strip()
-		price = connection.find("span", class_="transit-result-item__footer__text").get_text().strip()
-		
-		print(connection["aria-label"])
-		print(f"{line_name} from {station_from} from {time_departure} to {time_arrival} ({duration}) for {price}")
+	for day in day_container:
+		date = day.find("span", class_="travel-list-header__label").get_text().strip() # the date itself
+		print(f"======== {date} ========")
+
+		connections_ul = day.find("ul")	# container for all connections on this day
+
+		connection_items = connections_ul.findAll(class_= "transit-result-item transit-result__list__item") # list of all connections
+
+		for connection in connection_items: # each single connection
+			print(connection["aria-label"]) # overall description text
+			
+			leg_items = connection.findAll("li", class_= "legs-list__leg") # list of all transport legs (e.g. single train within a connection)
+			print(len(leg_items))
+			"""for leg in leg_items:
+				station_from = leg.find("span", class_="transit-result-item__header__name").get_text().strip()
+				duration = leg.find("span", class_="transit-result-item__header__duration").get_text().strip()
+				line_name = leg.find("span", class_="travel-tag__label travel-tag__label--margin").get_text().strip()
+				time_departure = leg.find("time", class_="legs-list__leg__time__time").get_text().strip()
+				time_arrival = leg.find("time", class_="trip-pattern-list__time").get_text().strip()
+				price = leg.find("span", class_="transit-result-item__footer__text").get_text().strip()"""
+			
+			
+			#print(f"{line_name} from {station_from} from {time_departure} to {time_arrival} ({duration}) for {price}")
+			print("--------------------")
 
 def read_html_file(file_path):
 	with open(file_path, "r") as file:
@@ -90,10 +102,11 @@ def main():
 	station_dict = read_stations("./data/stations.txt")
 	
 	if debug:
-		content = read_html_file("./debug/example_html.html")
+		content = read_html_file("./debug/example_multiday.html")
 	else:
 		url = generate_url(date = convert_to_unix_time(2023, 7, 13, 18, 0), station_from=station_dict["Bergen"], station_to=station_dict["Myrdal"])
 		content = fetch_website(url)
+		
 
 	# Mine content
 	transit_data = get_transit_container(content)
