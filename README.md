@@ -10,6 +10,7 @@ This project should be able to get prices of train tickets in Norway and monitor
 * save previous data (database? txt)
 * notification and some sort of low price calendar (maybe activating a cronjob and sending emails)
 * make it more usable by either an UI or terminal parameter
+* find a better data format
 
 ## Things to fix
 * Entur relies heavily on a weird URL format which requires for parameter for each station ([label, longitude, latitude, stopID]). Since three of them aren't obvious, there is a dictionary file in ``data/stations.txt`` which has some common stations in it. If yours is missing, add a new line in there. It might be possible to connect this to the station API of entur
@@ -26,5 +27,9 @@ This project should be able to get prices of train tickets in Norway and monitor
 * ``data/station.txt``: information about stations
 * ``debug/`` folder: some html fileswith example data so one does not need to fetch from the website for each run
 
+## Current data format (to be improved)
+* Connection: ```station_from: string, station_to: string, price: int, departure: string, arrival: string, duration (min): int, description: str, exchanges: int, legs: List[tuple(str, str)]```
+* Travelday: ```connections: List[Connection], date: str```
+
 ## Debug
-There is an example file in the debug folder. Activate ``debug=true`` in the main function such that it is not necessary to download the data every time you test something. This may also prevent you from being IP banned
+There is an example file in the debug folder. Activate ``debug=True`` in the main function such that it is not necessary to download the data every time you test something. This may also prevent you from being IP banned

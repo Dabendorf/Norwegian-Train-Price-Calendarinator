@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.options import Options
 import time
 import datetime
 import pytz
+from DataContainer import Connection, TravelDay
 
 def fetch_website(url):
 	"""Takes any URL and downloads its html content
@@ -51,12 +52,16 @@ def get_trains_from_html(html_content):
     html_content (string): html content
 
     Returns:
-    None: TODO
+    Travelday list (List[TravelDay]): List of travel days containing information
 
    """
 	day_container = html_content.findAll(class_ = "transit-result__list__container") # Each container for a single day, containing all connections
 
+	travelday_list = list()
+
 	for day in day_container:
+		connections = list()
+
 		date = day.find("span", class_="travel-list-header__label").get_text().strip() # the date itself
 		print(f"======== {date} ========")
 
@@ -65,21 +70,27 @@ def get_trains_from_html(html_content):
 		connection_items = connections_ul.findAll(class_= "transit-result-item transit-result__list__item") # list of all connections
 
 		for connection in connection_items: # each single connection
-			print(connection["aria-label"]) # overall description text
-			
 			leg_items = connection.findAll("li", class_= "legs-list__leg") # list of all transport legs (e.g. single train within a connection)
-			print(len(leg_items))
-			"""for leg in leg_items:
-				station_from = leg.find("span", class_="transit-result-item__header__name").get_text().strip()
-				duration = leg.find("span", class_="transit-result-item__header__duration").get_text().strip()
-				line_name = leg.find("span", class_="travel-tag__label travel-tag__label--margin").get_text().strip()
-				time_departure = leg.find("time", class_="legs-list__leg__time__time").get_text().strip()
-				time_arrival = leg.find("time", class_="trip-pattern-list__time").get_text().strip()
-				price = leg.find("span", class_="transit-result-item__footer__text").get_text().strip()"""
 			
-			
-			#print(f"{line_name} from {station_from} from {time_departure} to {time_arrival} ({duration}) for {price}")
-			print("--------------------")
+			# possible to get more information by clicking on he object or finding transport type and time in current html
+			# However, it currently mines content from the aria label
+			#for leg in leg_items:
+			#	print(leg)
+			aria_label_list = list(filter(None, connection["aria-label"].replace("Trykk for detaljer", "").replace("Reiseforslaget har et avvik.","").strip().split(".")))
+
+			duration = connection.find("span", class_="transit-result-item__header__duration").get_text().strip()
+			time_departure = connection.find("time", class_="legs-list__leg__time__time").get_text().strip()
+			time_arrival = connection.find("time", class_="trip-pattern-list__time").get_text().strip()
+			price = connection.find("span", class_="transit-result-item__footer__text").get_text().strip()
+			station_from = connection.find("span", class_="transit-result-item__header__name").get_text().strip()
+
+			conn = Connection(station_from = station_from, station_to = None, price = price, departure = time_departure, arrival = time_arrival, duration = duration, legs = [a.strip() for a in aria_label_list[2].split(",")])
+
+			connections.append(conn)
+		travelday_list.append(TravelDay(connections=connections, date=date))
+		
+
+	return travelday_list
 
 def read_html_file(file_path):
 	"""Reads an html file
@@ -185,6 +196,10 @@ def main():
 	# Convert html content to proper information
 	transit_data = get_transit_container(content)
 	train_data = get_trains_from_html(transit_data)
+
+	for day in train_data:
+		print(f"{day}\n")
+		
 
 	# Output
 	#prettified_content = train_data.prettify()
