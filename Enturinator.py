@@ -7,6 +7,15 @@ import datetime
 import pytz
 
 def fetch_website(url):
+	"""Takes any URL and downloads its html content
+
+    Parameters:
+    url (string): webpage URL
+
+    Returns:
+    string: html content
+
+   """
 	options = Options()
 	options.add_argument("--headless")  # Run Chrome in headless mode
 	driver = webdriver.Chrome(options=options)
@@ -17,6 +26,15 @@ def fetch_website(url):
 	return content
 
 def get_transit_container(html_content):
+	"""Searches for the transit container within the Entur website
+
+    Parameters:
+    html_content (string): html content
+
+    Returns:
+    string: html content (transit container)
+
+   """
 	soup = BeautifulSoup(html_content, "html.parser")
 	container = soup.find("div", class_="transit-result__list")
 
@@ -27,6 +45,15 @@ def get_transit_container(html_content):
 		exit(0)
 
 def get_trains_from_html(html_content):
+	"""Takes as argument html content and converts it to proper information about train connections and their prices
+
+    Parameters:
+    html_content (string): html content
+
+    Returns:
+    None: TODO
+
+   """
 	day_container = html_content.findAll(class_ = "transit-result__list__container") # Each container for a single day, containing all connections
 
 	for day in day_container:
@@ -55,11 +82,34 @@ def get_trains_from_html(html_content):
 			print("--------------------")
 
 def read_html_file(file_path):
+	"""Reads an html file
+
+    Parameters:
+    file_path (string): path of the file to read
+
+    Returns:
+    string: content of the file
+
+   """
 	with open(file_path, "r") as file:
 		content = file.read()
 	return content
 
 def generate_url(date, station_from, station_to):
+	"""Generates the URL to fetch from the Entur website
+
+    Parameters:
+    date (int): Travel date as unix time
+	station_from (tuple): Tuple of station information
+	station_to (tuple): Tuple of station information
+
+    Returns:
+    string: URL
+
+    """
+	print(type(date))
+	print(type(station_from))
+	print(type(station_to))
 	url = f"https://entur.no/reiseresultater?transportModes=rail%2Ctram%2Cbus%2Ccoach%2Cwater%2Ccar_ferry%2Cmetro%2Cflytog%2Cflybuss"
 	url += f"&date={date}000"	# travel day
 	url += f"&tripMode=oneway"
@@ -77,6 +127,15 @@ def generate_url(date, station_from, station_to):
 	return url
 
 def read_stations(file_path):
+	"""Reads the station file
+
+    Parameters:
+    file_path (string): Path of the station file
+
+    Returns:
+    dict(string, tuple): Dictionary of station information
+
+   """
 	data_dict = {}
 	with open(file_path, "r") as file:
 		lines = file.readlines()
@@ -89,6 +148,19 @@ def read_stations(file_path):
 	return data_dict
 
 def convert_to_unix_time(year, month, day, hour, minute):
+	"""Converts date and time information to unix time (based on Oslo timezone)
+
+    Parameters:
+    year (int): year
+	month (int): month
+	day (int): day
+	hour (int): hour
+	minute (int): minute
+
+    Returns:
+    int: Unix time
+
+   """
 	oslo_timezone = pytz.timezone("Europe/Oslo")
 	oslo_datetime = oslo_timezone.localize(datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute))
 	unix_time = int(oslo_datetime.timestamp())
@@ -98,17 +170,19 @@ def main():
 	# Parameter
 	debug = True
 
-	# Stations
+	# Read stations
 	station_dict = read_stations("./data/stations.txt")
 	
 	if debug:
+		# Read example file
 		content = read_html_file("./debug/example_multiday.html")
 	else:
+		# Generate URL and fetch information from the website
 		url = generate_url(date = convert_to_unix_time(2023, 7, 13, 18, 0), station_from=station_dict["Bergen"], station_to=station_dict["Myrdal"])
 		content = fetch_website(url)
 		
 
-	# Mine content
+	# Convert html content to proper information
 	transit_data = get_transit_container(content)
 	train_data = get_trains_from_html(transit_data)
 

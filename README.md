@@ -17,7 +17,8 @@ This project should be able to get prices of train tickets in Norway and monitor
 * The data only shows information being visible on the main page. Theoretically, there is more information by clicking on each element
 
 ## Run
-* ```python3 Enturinator.py```
+* install the requirements: ```pip install -r requirements.txt```
+* run programme: ```python3 Enturinator.py```
 * put in the wanted information like date and stations into the main function
 
 ## Project Structure
