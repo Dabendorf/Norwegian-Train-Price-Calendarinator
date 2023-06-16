@@ -6,6 +6,7 @@ import time
 import datetime
 import pytz
 from DataContainer import Connection, TravelDay
+from Database import DatabaseManager
 
 def fetch_website(url):
 	"""Takes any URL and downloads its html content
@@ -63,7 +64,6 @@ def get_trains_from_html(html_content):
 		connections = list()
 
 		date = day.find("span", class_="travel-list-header__label").get_text().strip() # the date itself
-		print(f"======== {date} ========")
 
 		connections_ul = day.find("ul")	# container for all connections on this day
 
@@ -118,9 +118,6 @@ def generate_url(date, station_from, station_to):
     string: URL
 
     """
-	print(type(date))
-	print(type(station_from))
-	print(type(station_to))
 	url = f"https://entur.no/reiseresultater?transportModes=rail%2Ctram%2Cbus%2Ccoach%2Cwater%2Ccar_ferry%2Cmetro%2Cflytog%2Cflybuss"
 	url += f"&date={date}000"	# travel day
 	url += f"&tripMode=oneway"
@@ -177,6 +174,15 @@ def convert_to_unix_time(year, month, day, hour, minute):
 	unix_time = int(oslo_datetime.timestamp())
 	return unix_time
 
+def connect_database():
+	db_manager = DatabaseManager("data/ObservedPrices.db")
+
+	db_manager.connect()
+
+	db_manager.create_tables()
+	
+	return db_manager
+
 def main():
 	# Parameter
 	debug = True
@@ -197,8 +203,27 @@ def main():
 	transit_data = get_transit_container(content)
 	train_data = get_trains_from_html(transit_data)
 
+	db_manager = connect_database()
+
+	observe_id = db_manager.insert_to_observe("Stavanger", "Oslo S", "2023-07-06", "2023-07-06", "2023-06-30")
+
 	for day in train_data:
-		print(f"{day}\n")
+		print(f"{day.date}\n")
+		for conn in day.connections:
+			print(conn)
+			db_manager.insert_price_data(observe_id, '2023-06-15 12:00:00', conn.price)
+			
+
+	
+
+	# Insert data into the ToObserve table
+	#observe_id = db_manager.insert_to_observe('Station A', 'Station B', '2023-06-15', '2023-06-20', '2023-06-30')
+
+	# Insert data into the PriceData table
+	#db_manager.insert_price_data(observe_id, '2023-06-15 12:00:00', 10.5)
+
+	# Disconnect from the database
+	db_manager.disconnect()
 		
 
 	# Output

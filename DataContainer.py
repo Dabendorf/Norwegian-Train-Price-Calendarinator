@@ -4,12 +4,14 @@ class Connection:
 	def __init__(self, station_from: str, station_to: str, price: int, departure: str, arrival: str, duration: str, legs: List[Tuple[str, str]]):
 		self.station_from = station_from
 		self.station_to = station_to
-		self.price = price
 		self.departure = departure
 		self.arrival = arrival
 		self.duration = duration
 		self.legs = legs
 		self.exchanges = len(legs)-1
+
+		if price != "Billetter selges til deler av reisen kr":
+			self.price = price.replace(",- kr", "")
 
 	def __str__(self):
 		return f"From: {self.station_from}\nTo: {self.station_to}\nPrice: {self.price} kr\nDeparture: {self.departure}\nArrival: {self.arrival}\nDuration: {self.duration} minutes\nExchanges: {self.exchanges}\nLegs: {self.legs}\n"
