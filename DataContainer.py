@@ -10,8 +10,7 @@ class Connection:
 		self.legs = legs
 		self.exchanges = len(legs)-1
 
-		if price != "Billetter selges til deler av reisen kr":
-			self.price = price.replace(",- kr", "")
+		self.price = price
 
 	def __str__(self):
 		return f"From: {self.station_from}\nTo: {self.station_to}\nPrice: {self.price} kr\nDeparture: {self.departure}\nArrival: {self.arrival}\nDuration: {self.duration} minutes\nExchanges: {self.exchanges}\nLegs: {self.legs}\n"

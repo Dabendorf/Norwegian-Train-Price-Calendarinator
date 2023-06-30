@@ -4,9 +4,11 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
 import datetime
+from datetime import datetime
 import pytz
 from DataContainer import Connection, TravelDay
 from Database import DatabaseManager
+import re
 
 def fetch_website(url):
 	"""Takes any URL and downloads its html content
@@ -64,7 +66,7 @@ def get_trains_from_html(html_content):
 		connections = list()
 
 		date = day.find("span", class_="travel-list-header__label").get_text().strip() # the date itself
-
+		
 		connections_ul = day.find("ul")	# container for all connections on this day
 
 		connection_items = connections_ul.findAll(class_= "transit-result-item transit-result__list__item") # list of all connections
@@ -84,7 +86,11 @@ def get_trains_from_html(html_content):
 			price = connection.find("span", class_="transit-result-item__footer__text").get_text().strip()
 			station_from = connection.find("span", class_="transit-result-item__header__name").get_text().strip()
 
-			conn = Connection(station_from = station_from, station_to = None, price = price, departure = time_departure, arrival = time_arrival, duration = duration, legs = [a.strip() for a in aria_label_list[2].split(",")])
+			if "ikke" in price.lower() or "billetter" in price.lower() or "selges" in price.lower():
+				price = 2147483647.0
+			else:
+				price = float(re.findall(r'\d+', price)[0])
+			conn = Connection(station_from = station_from, station_to = None, price = price, departure = f" {convert_norwegian_day_to_date(date)} {time_departure}", arrival = time_arrival, duration = duration, legs = [a.strip() for a in aria_label_list[2].split(",")])
 
 			connections.append(conn)
 		travelday_list.append(TravelDay(connections=connections, date=date))
@@ -174,6 +180,27 @@ def convert_to_unix_time(year, month, day, hour, minute):
 	unix_time = int(oslo_datetime.timestamp())
 	return unix_time
 
+def convert_norwegian_day_to_date(datestring):
+	weekday_prefixes = ["mandag ", "tirsdag ", "onsdag ", "torsdag ", "fredag ", "lørdag ", "søndag "]
+	for prefix in weekday_prefixes:
+		if datestring.lower().startswith(prefix):
+			datestring = datestring[len(prefix):]
+			break
+	
+	norwegian_month_names = {
+		"januar": 1, "februar": 2, "mars": 3, "april": 4,
+		"mai": 5, "juni": 6, "juli": 7, "august": 8,
+		"september": 9, "oktober": 10, "november": 11, "desember": 12
+	}
+
+	day, month_name = datestring.split(". ")
+	month = norwegian_month_names[month_name]
+
+	date = datetime(datetime.now().year, month, int(day))
+	formatted_date = date.strftime("%Y-%m-%d")
+
+	return formatted_date
+
 def connect_database():
 	db_manager = DatabaseManager("data/ObservedPrices.db")
 
@@ -206,21 +233,22 @@ def main():
 	db_manager = connect_database()
 
 	observe_id = db_manager.insert_to_observe("Stavanger", "Oslo S", "2023-07-06", "2023-07-06", "2023-06-30")
-
+	observe_id = 5
 	for day in train_data:
 		print(f"{day.date}\n")
 		for conn in day.connections:
-			print(conn)
-			db_manager.insert_price_data(observe_id, '2023-06-15 12:00:00', conn.price)
-			
+			changed, price = db_manager.insert_price_data(observe_id, conn.departure, conn.price)
+			if changed:
+				print(f"Its cheaper now! New price: {price}")
+	
 
 	
 
 	# Insert data into the ToObserve table
-	#observe_id = db_manager.insert_to_observe('Station A', 'Station B', '2023-06-15', '2023-06-20', '2023-06-30')
+	#observe_id = db_manager.insert_to_observe('Stavanger', 'Oslo S', '2023-06-15', '2023-06-20', '2023-08-30')
 
 	# Insert data into the PriceData table
-	#db_manager.insert_price_data(observe_id, '2023-06-15 12:00:00', 10.5)
+	#db_manager.insert_price_data(observe_id, '2023-06-15 12:00:00', 12.7)
 
 	# Disconnect from the database
 	db_manager.disconnect()
