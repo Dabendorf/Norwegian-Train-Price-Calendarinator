@@ -246,7 +246,10 @@ def main():
 	db_manager = connect_database("data/ObservedPrices.db")
 	logger.debug("Database connected")
 
+	#observe_id = db_manager.insert_to_observe("Stavanger", "Oslo S", "2023-07-06", "2023-07-07", "2023-08-30")
+	#observe_id = db_manager.insert_to_observe("Stavanger", "Oslo S", "2023-08-06", "2023-08-10", "2023-08-30")
 	#observe_id = db_manager.insert_to_observe("Bergen", "Oslo S", "2023-08-06", "2023-08-10", "2023-08-30")
+	
 	all_observe_ids = db_manager.get_all_observe_ids()
 	logger.debug(f"IDs to observe: {all_observe_ids}")
 
@@ -280,25 +283,11 @@ def main():
 			#logger.debug(f"Date: {day.date}\n")
 			for conn in day.connections:
 				changed, price = db_manager.insert_price_data(observe_id, conn.departure, conn.price)
-				#if changed:
-				#	print(f"Its cheaper now! New price: {price}")"""
-	
-
-	
-
-	# Insert data into the ToObserve table
-	#observe_id = db_manager.insert_to_observe('Stavanger', 'Oslo S', '2023-07-06', '2023-07-07', '2023-08-30')
-
-	# Insert data into the PriceData table
-	#db_manager.insert_price_data(observe_id, '2023-06-15 12:00:00', 12.7)
+				if changed:
+					print(f"Its cheaper now! New price: {price}")
 
 	# Disconnect from the database
 	db_manager.disconnect()
-		
-
-	# Output
-	#prettified_content = train_data.prettify()
-	#print(prettified_content)
 
 	
 

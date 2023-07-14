@@ -1,4 +1,5 @@
 import sqlite3
+import logging
 
 class DatabaseManager:
 	def __init__(self, database_name):
@@ -66,9 +67,16 @@ class DatabaseManager:
 		if result is not None:
 			# An old value exists
 			old_price = result[0]
-			print(f"{datetime} {result} {old_price} {price}")
+			#logging.debug(f"{datetime} {result} {old_price} {price}")
 			if old_price > price:
-				return True, old_price
+				self.cursor.execute('''
+					UPDATE PriceData SET price=? WHERE id=?
+				''', (price, observe_id))
+				self.connection.commit()
+				if old_price == 2147483647:
+					return False, price
+				else:
+					return True, price
 			else:
 				return False, None
 		else:

@@ -17,6 +17,9 @@ This project should be able to get prices of train tickets in Norway and monitor
 * relies on Google Chrome, maybe find something else (Raspberry Pi friendly)
 * The data only shows information being visible on the main page. Theoretically, there is more information by clicking on each element
 
+## Things to know
+* If there are two trains at the same time on the same day, it does not save information about both connections but only saves the cheaper one of them (treating them both as the same connection)
+
 ## Run
 * install the requirements: ```pip install -r requirements.txt```
 * run programme: ```python3 Enturinator.py```
