@@ -58,9 +58,8 @@ class DatabaseManager:
 	def insert_price_data(self, observe_id, datetime, price):
 		""" returns true if the price is lower than a previously existing price
 		"""
-		self.cursor.execute('''
-			SELECT price FROM PriceData WHERE observeID = ? AND datetime = ?
-			''', (observe_id, datetime))
+		query = f"SELECT price FROM PriceData WHERE observeID = {observe_id} AND datetime = '{datetime}'"
+		self.cursor.execute(query)
 
 		result = self.cursor.fetchone()
 
@@ -69,9 +68,8 @@ class DatabaseManager:
 			old_price = result[0]
 			#logging.debug(f"{datetime} {result} {old_price} {price}")
 			if old_price > price:
-				self.cursor.execute('''
-					UPDATE PriceData SET price=? WHERE id=?
-				''', (price, observe_id))
+				query = f"UPDATE PriceData SET price={price} WHERE observeID={observe_id} AND datetime = '{datetime}'"
+				self.cursor.execute(query)
 				self.connection.commit()
 				if old_price == 2147483647:
 					return False, price
@@ -81,10 +79,7 @@ class DatabaseManager:
 				return False, None
 		else:
 			# Insert the new row
-			self.cursor.execute('''
-				INSERT INTO PriceData (observeID, datetime, price)
-				VALUES (?, ?, ?)
-			''', (observe_id, datetime, price))
+			self.cursor.execute(f"INSERT INTO PriceData (observeID, datetime, price) VALUES ({observe_id}, '{datetime}', {price})")
 
 			self.connection.commit()
 			return False, None
@@ -97,9 +92,12 @@ class DatabaseManager:
 		return unique_ids
 
 	def get_observe_row(self, id: int):
-		self.cursor.execute('''
-			SELECT * FROM ToObserve WHERE id=?
-			''', (str(id)))
+		self.cursor.execute(f"SELECT * FROM ToObserve WHERE id={str(id)}")
+
+		return self.cursor.fetchone()
+
+	def get_lowest_price(self, id: int):
+		self.cursor.execute(f"SELECT MIN(price),id,datetime FROM PriceData WHERE observeID = {str(id)} GROUP BY observeID")
 
 		return self.cursor.fetchone()
 

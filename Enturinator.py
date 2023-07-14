@@ -88,6 +88,8 @@ def get_trains_from_html(html_content):
 			station_from = connection.find("span", class_="transit-result-item__header__name").get_text().strip()
 
 			if "ikke" in price.lower() or "billetter" in price.lower() or "selges" in price.lower():
+				if "Billetter selges ikke av Entur".lower() in price.lower() or "Billetter selges deler av reisen".lower():
+					continue
 				price = 2147483647.0
 			else:
 				price = float(re.findall(r'\d+', price)[0])
@@ -125,7 +127,17 @@ def generate_url(date, station_from, station_to):
     string: URL
 
     """
-	url = f"https://entur.no/reiseresultater?transportModes=rail%2Ctram%2Cbus%2Ccoach%2Cwater%2Ccar_ferry%2Cmetro%2Cflytog%2Cflybuss"
+	transport_types = [
+		#"%2Cbus",
+		#"%2Ccoach",
+		"%2Ctram",
+		"%2Cwater",
+		"%2Ccar_ferry",
+		"%2Cmetro",
+		"%2Cflytog",
+		"%2Cflybuss"
+	]
+	url = f"https://entur.no/reiseresultater?transportModes=rail"+("".join(transport_types))
 	url += f"&date={date}000"	# travel day
 	url += f"&tripMode=oneway"
 	url += f"&walkSpeed=1.3"
@@ -230,7 +242,7 @@ def connect_database(databasepath):
 	return db_manager
 
 def main():
-	logging.basicConfig(format="%(name)s - %(levelname)s - %(message)s", level=logging.DEBUG) #filename="app.log", filemode="w", 
+	logging.basicConfig(format="%(name)s - %(levelname)s - %(message)s", level=logging.INFO) #filename="app.log", filemode="w", 
 	logger = logging.getLogger("Main")
 
 
@@ -254,7 +266,7 @@ def main():
 	logger.debug(f"IDs to observe: {all_observe_ids}")
 
 	# This is a file for debugging, it contains mapping between observe_ids and filenames
-	observe_id_filename_dict = {1: "example_multiday_20230706.html"}
+	observe_id_filename_dict = {3: "entur_3_20230806.html", 2: "entur_2_20230806.html"}
 
 	for observe_id in all_observe_ids:
 		logger.debug(f"Observe_id: {observe_id}")
@@ -277,14 +289,21 @@ def main():
 		# Convert html content to proper information
 		transit_data = get_transit_container(content)
 		train_data = get_trains_from_html(transit_data)
+		
 		logger.debug(f"Transit container and trains are fetched from html")
+		with open(f"debug/entur_{observe_id}_{data_el[0]}{data_el[1]}{data_el[2]}.html", "w") as file:
+			prettified_content = transit_data.prettify()
+			file.write(prettified_content)
 
 		for day in train_data:
-			#logger.debug(f"Date: {day.date}\n")
 			for conn in day.connections:
 				changed, price = db_manager.insert_price_data(observe_id, conn.departure, conn.price)
 				if changed:
 					print(f"Its cheaper now! New price: {price}")
+
+		lowest_price = db_manager.get_lowest_price(observe_id)
+		print(f"Cheapest price for id={observe_id} from {row[1]} to {row[2]} on {data_el[0]}-{data_el[1]}-{data_el[2]}:")
+		print(f"{lowest_price[0]} at {lowest_price[2]}")
 
 	# Disconnect from the database
 	db_manager.disconnect()
