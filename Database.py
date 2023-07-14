@@ -80,3 +80,10 @@ class DatabaseManager:
 
 			self.connection.commit()
 			return False, None
+
+	def get_all_observe_ids(self) -> int:
+		query = "SELECT DISTINCT id FROM ToObserve;"
+		self.cursor.execute(query)
+
+		unique_ids = [row[0] for row in self.cursor.fetchall()]
+		return unique_ids

@@ -235,7 +235,7 @@ def main():
 	# Read stations
 	station_dict = read_stations("./data/stations.txt")
 	
-	if debug:
+	"""if debug:
 		# Read example file
 		content = read_html_file("./debug/example_multiday.html")
 	else:
@@ -251,19 +251,21 @@ def main():
 	db_manager = connect_database("data/ObservedPrices.db")
 
 	observe_id = db_manager.insert_to_observe("Stavanger", "Oslo S", "2023-07-06", "2023-07-06", "2023-06-30")
-	observe_id = 5
+	all_ids = db_manager.get_all_observe_ids()
+	
+
 	for day in train_data:
 		print(f"{day.date}\n")
 		for conn in day.connections:
 			changed, price = db_manager.insert_price_data(observe_id, conn.departure, conn.price)
 			if changed:
-				print(f"Its cheaper now! New price: {price}")
+				print(f"Its cheaper now! New price: {price}")"""
 	
 
 	
 
 	# Insert data into the ToObserve table
-	#observe_id = db_manager.insert_to_observe('Stavanger', 'Oslo S', '2023-06-15', '2023-06-20', '2023-08-30')
+	#observe_id = db_manager.insert_to_observe('Stavanger', 'Oslo S', '2023-07-06', '2023-07-07', '2023-08-30')
 
 	# Insert data into the PriceData table
 	#db_manager.insert_price_data(observe_id, '2023-06-15 12:00:00', 12.7)
