@@ -9,6 +9,7 @@ import pytz
 from DataContainer import Connection, TravelDay
 from Database import DatabaseManager
 import re
+import logging
 
 def fetch_website(url):
 	"""Takes any URL and downloads its html content
@@ -176,7 +177,7 @@ def convert_to_unix_time(year, month, day, hour, minute):
 
    """
 	oslo_timezone = pytz.timezone("Europe/Oslo")
-	oslo_datetime = oslo_timezone.localize(datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute))
+	oslo_datetime = oslo_timezone.localize(datetime(year=year, month=month, day=day, hour=hour, minute=minute))
 	unix_time = int(oslo_datetime.timestamp())
 	return unix_time
 
@@ -229,37 +230,58 @@ def connect_database(databasepath):
 	return db_manager
 
 def main():
+	logging.basicConfig(format="%(name)s - %(levelname)s - %(message)s", level=logging.DEBUG) #filename="app.log", filemode="w", 
+	logger = logging.getLogger("Main")
+
+
 	# Parameter
 	debug = True
+	if debug:
+		logger.debug("Debug mode is on")
 
 	# Read stations
 	station_dict = read_stations("./data/stations.txt")
-	
-	"""if debug:
-		# Read example file
-		content = read_html_file("./debug/example_multiday.html")
-	else:
-		# Generate URL and fetch information from the website
-		url = generate_url(date = convert_to_unix_time(2023, 7, 13, 18, 0), station_from=station_dict["Bergen"], station_to=station_dict["Myrdal"])
-		content = fetch_website(url)
-		
-
-	# Convert html content to proper information
-	transit_data = get_transit_container(content)
-	train_data = get_trains_from_html(transit_data)
+	logger.debug("Stations read")
 
 	db_manager = connect_database("data/ObservedPrices.db")
+	logger.debug("Database connected")
 
-	observe_id = db_manager.insert_to_observe("Stavanger", "Oslo S", "2023-07-06", "2023-07-06", "2023-06-30")
-	all_ids = db_manager.get_all_observe_ids()
-	
+	#observe_id = db_manager.insert_to_observe("Bergen", "Oslo S", "2023-08-06", "2023-08-10", "2023-08-30")
+	all_observe_ids = db_manager.get_all_observe_ids()
+	logger.debug(f"IDs to observe: {all_observe_ids}")
 
-	for day in train_data:
-		print(f"{day.date}\n")
-		for conn in day.connections:
-			changed, price = db_manager.insert_price_data(observe_id, conn.departure, conn.price)
-			if changed:
-				print(f"Its cheaper now! New price: {price}")"""
+	# This is a file for debugging, it contains mapping between observe_ids and filenames
+	observe_id_filename_dict = {1: "example_multiday_20230706.html"}
+
+	for observe_id in all_observe_ids:
+		logger.debug(f"Observe_id: {observe_id}")
+
+		# Fetch data
+		row = db_manager.get_observe_row(observe_id)
+		data_el = row[3].split("-")
+
+		if debug:
+			if observe_id in observe_id_filename_dict:
+				logger.debug("Debug mode: found debug file")
+				content = read_html_file(f"./debug/{observe_id_filename_dict[observe_id]}")
+			else:
+				logger.debug("Debug file not found, skip over")
+				continue
+		else:
+			url = generate_url(date = convert_to_unix_time(int(data_el[0]), int(data_el[1]), int(data_el[2]), 0, 0), station_from=station_dict[row[1]], station_to=station_dict[row[2]])
+			content = fetch_website(url)
+
+		# Convert html content to proper information
+		transit_data = get_transit_container(content)
+		train_data = get_trains_from_html(transit_data)
+		logger.debug(f"Transit container and trains are fetched from html")
+
+		for day in train_data:
+			#logger.debug(f"Date: {day.date}\n")
+			for conn in day.connections:
+				changed, price = db_manager.insert_price_data(observe_id, conn.departure, conn.price)
+				#if changed:
+				#	print(f"Its cheaper now! New price: {price}")"""
 	
 
 	

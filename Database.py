@@ -87,3 +87,12 @@ class DatabaseManager:
 
 		unique_ids = [row[0] for row in self.cursor.fetchall()]
 		return unique_ids
+
+	def get_observe_row(self, id: int):
+		self.cursor.execute('''
+			SELECT * FROM ToObserve WHERE id=?
+			''', (str(id)))
+
+		return self.cursor.fetchone()
+
+
