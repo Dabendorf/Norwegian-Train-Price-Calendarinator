@@ -181,6 +181,15 @@ def convert_to_unix_time(year, month, day, hour, minute):
 	return unix_time
 
 def convert_norwegian_day_to_date(datestring):
+	"""Converts date and time information to unix time (based on Oslo timezone)
+
+    Parameters:
+    datastring (str): entur formated string describing a date
+
+    Returns:
+    str: Date in format %Y-%m-%d
+
+   """
 	weekday_prefixes = ["mandag ", "tirsdag ", "onsdag ", "torsdag ", "fredag ", "lørdag ", "søndag "]
 	for prefix in weekday_prefixes:
 		if datestring.lower().startswith(prefix):
@@ -201,8 +210,17 @@ def convert_norwegian_day_to_date(datestring):
 
 	return formatted_date
 
-def connect_database():
-	db_manager = DatabaseManager("data/ObservedPrices.db")
+def connect_database(databasepath):
+	"""Connects to a database and returns a database manager
+
+    Parameters:
+    databasepath (str): path to database
+
+    Returns:
+    DatabaseManager: DatabaseManager
+
+   """
+	db_manager = DatabaseManager(databasepath)
 
 	db_manager.connect()
 
@@ -230,7 +248,7 @@ def main():
 	transit_data = get_transit_container(content)
 	train_data = get_trains_from_html(transit_data)
 
-	db_manager = connect_database()
+	db_manager = connect_database("data/ObservedPrices.db")
 
 	observe_id = db_manager.insert_to_observe("Stavanger", "Oslo S", "2023-07-06", "2023-07-06", "2023-06-30")
 	observe_id = 5
