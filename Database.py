@@ -72,11 +72,11 @@ class DatabaseManager:
 				self.cursor.execute(query)
 				self.connection.commit()
 				if old_price == 2147483647:
-					return False, price
+					return False, price, None
 				else:
-					return True, price
+					return True, price, old_price
 			else:
-				return False, None
+				return False, None, None
 		else:
 			# Insert the new row
 			self.cursor.execute(f"INSERT INTO PriceData (observeID, datetime, price) VALUES ({observe_id}, '{datetime}', {price})")

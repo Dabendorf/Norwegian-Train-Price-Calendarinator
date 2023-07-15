@@ -10,6 +10,7 @@ from DataContainer import Connection, TravelDay
 from Database import DatabaseManager
 import re
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import smtplib
 import ssl
 
@@ -338,14 +339,23 @@ def connect_database(databasepath):
 	return db_manager
 
 def main():
-	logging.basicConfig(format="%(name)s - %(levelname)s - %(message)s", level=logging.DEBUG) #filename="app.log", filemode="w", 
+	# Logger
+	log_format = "%(name)s - %(asctime)s - %(levelname)s - %(message)s"
+	logging.basicConfig(format=log_format, level=logging.INFO)
 	logger = logging.getLogger("Main")
+	log_handler = TimedRotatingFileHandler("logs/enturbot.log", when="w0", interval=1, backupCount=4)
+	
+	formatter = logging.Formatter(log_format)
+	log_handler.setFormatter(formatter)
+	logger.addHandler(log_handler)
 
+	# Configuration
 	global config
 	config = read_configuration()
 	logger.debug("Read configuration file")
 	logger.debug(f"{config}")
 
+	# Mail
 	mailActivated = config.get("emailActivated", False)=="True"
 	if mailActivated:
 		mailconfig = read_mailconfiguration()
@@ -403,16 +413,16 @@ def main():
 
 		for day in train_data:
 			for conn in day.connections:
-				changed, price = db_manager.insert_price_data(observe_id, conn.departure, conn.price)
+				changed, price, old_price = db_manager.insert_price_data(observe_id, conn.departure, conn.price)
 				if changed:
-					logger.info(f"Its cheaper now! New price: {price}")
+					if mailActivated:
+						logger.info(f"The connection {row[1]} to {row[2]} is cheaper now. The new price at {conn.departure} is: {price}")
+						send_simple_email(mailconfig["emailTo"], f"We found a cheaper price", f"The connection {row[1]} to {row[2]} is cheaper now. The new price at{conn.departure} is: {price} NOK (before {old_price}).\nThis is not necessarily the cheapest price of the day.", mailconfig)
+						logger.info("Mail sent")
 
 		lowest_price = db_manager.get_lowest_price(observe_id)
 		logger.info(f"Cheapest price for id={observe_id} from {row[1]} to {row[2]} on {data_el[0]}-{data_el[1]}-{data_el[2]}:")
 		logger.info(f"{lowest_price[0]} at {lowest_price[2]}")
-
-	if mailActivated:
-		send_simple_email(mailconfig["emailTo"], "Hello World", "Content", mailconfig)
 
 	# Disconnect from the database
 	db_manager.disconnect()

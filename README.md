@@ -7,10 +7,10 @@ This project should be able to get prices of train tickets in Norway and monitor
 * save prices (maybe in a database) and inform about changes
 
 ## Todo
-* notification and some sort of low price calendar (maybe activating a cronjob and sending emails)
 * make it more usable by either an UI or terminal parameter
 * find a better data format
 * currently, it only searches for pricers for adults (voksen); should be able to search others (e.g. student) as well
+* it only informs about cheaper connections, this must not necessarily be the cheapest price of the day
 
 ## Things to fix
 * Entur relies heavily on a weird URL format which requires for parameter for each station ([label, longitude, latitude, stopID]). Since three of them aren't obvious, there is a dictionary file in ``data/stations.txt`` which has some common stations in it. If yours is missing, add a new line in there. It might be possible to connect this to the station API of entur
