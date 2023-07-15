@@ -10,17 +10,70 @@ from DataContainer import Connection, TravelDay
 from Database import DatabaseManager
 import re
 import logging
+import smtplib
+import ssl
+
+def send_simple_email(to, subject, body, config_path="data/emailconfig.txt"):
+	"""Sends an email notification
+
+	Parameters:
+	to (string): receiver
+	subject (string): subject
+	body (string): Email content
+	config_path (string): Path to the config file, per default data/config.txt
+	"""
+	with open(config_path) as config_file:
+		lines = [i.strip() for i in config_file.readlines() if (not i.startswith("#") and len(i.strip()) > 0)]
+
+		mailconfig_dict = dict()
+		for line in lines:
+			linesplit = line.split("\t")
+			if len(linesplit) != 2:
+				logging.getLogger("Main").warning(f"Wrong config file format in this line:\n{line}")
+			else:
+				splitarg = linesplit[1].split(",")
+				if len(splitarg) > 1:
+					mailconfig_dict[linesplit[0]] = splitarg
+				else:
+					mailconfig_dict[linesplit[0]] = linesplit[1]
+		
+	if "host" not in mailconfig_dict or "mailaddress" not in mailconfig_dict or "password" not in mailconfig_dict:
+		logging.getLogger("Main").warning(f"Missing argument for email configuration. No email will be send.")
+		logging.getLogger("Main").warning(f"Mail config: {mailconfig_dict}")
+		return
+
+
+	#Your SMTP server
+	host = mailconfig_dict["host"]
+	port = int(mailconfig_dict.get("port",465))
+
+	#Your credentials
+	login = mailconfig_dict["mailaddress"]
+	password = mailconfig_dict["password"]
+
+	#Build your email
+	context = ssl.create_default_context()
+
+	email = f"""Subject: {subject}
+To: {to}
+From: {login}
+{body}"""
+
+	#Send email
+	with smtplib.SMTP_SSL(host, port, context=context) as server:
+		server.login(login, password)
+		server.sendmail(login, to, email)
 
 def read_configuration(config_path="data/config.txt"):
 	"""Reads the preset configuration of the project
 
-    Parameters:
-    config_path (string): Path to the config file, per default data/config.txt
+	Parameters:
+	config_path (string): Path to the config file, per default data/config.txt
 
-    Returns:
-    string: html content
+	Returns:
+	string: configuration dictionary
 
-    """
+	"""
 	with open(config_path) as config_file:
 		lines = [i.strip() for i in config_file.readlines() if (not i.startswith("#") and len(i.strip()) > 0)]
 
@@ -43,13 +96,13 @@ def read_configuration(config_path="data/config.txt"):
 def fetch_website(url):
 	"""Takes any URL and downloads its html content
 
-    Parameters:
-    url (string): webpage URL
+	Parameters:
+	url (string): webpage URL
 
-    Returns:
-    string: html content
+	Returns:
+	string: html content
 
-    """
+	"""
 	options = Options()
 	options.add_argument("--headless")  # Run Chrome in headless mode
 	driver = webdriver.Chrome(options=options)
@@ -62,11 +115,11 @@ def fetch_website(url):
 def get_transit_container(html_content):
 	"""Searches for the transit container within the Entur website
 
-    Parameters:
-    html_content (string): html content
+	Parameters:
+	html_content (string): html content
 
-    Returns:
-    string: html content (transit container)
+	Returns:
+	string: html content (transit container)
 
    """
 	soup = BeautifulSoup(html_content, "html.parser")
@@ -82,11 +135,11 @@ def get_transit_container(html_content):
 def get_trains_from_html(html_content):
 	"""Takes as argument html content and converts it to proper information about train connections and their prices
 
-    Parameters:
-    html_content (string): html content
+	Parameters:
+	html_content (string): html content
 
-    Returns:
-    Travelday list (List[TravelDay]): List of travel days containing information
+	Returns:
+	Travelday list (List[TravelDay]): List of travel days containing information
 
    """
 	day_container = html_content.findAll(class_ = "transit-result__list__container") # Each container for a single day, containing all connections
@@ -134,11 +187,11 @@ def get_trains_from_html(html_content):
 def read_html_file(file_path):
 	"""Reads an html file
 
-    Parameters:
-    file_path (string): path of the file to read
+	Parameters:
+	file_path (string): path of the file to read
 
-    Returns:
-    string: content of the file
+	Returns:
+	string: content of the file
 
    """
 	with open(file_path, "r") as file:
@@ -148,15 +201,15 @@ def read_html_file(file_path):
 def generate_url(date, station_from, station_to):
 	"""Generates the URL to fetch from the Entur website
 
-    Parameters:
-    date (int): Travel date as unix time
+	Parameters:
+	date (int): Travel date as unix time
 	station_from (tuple): Tuple of station information
 	station_to (tuple): Tuple of station information
 
-    Returns:
-    string: URL
+	Returns:
+	string: URL
 
-    """
+	"""
 	transport_types = [
 		#"%2Cbus",
 		#"%2Ccoach",
@@ -191,11 +244,11 @@ def generate_url(date, station_from, station_to):
 def read_stations(file_path):
 	"""Reads the station file
 
-    Parameters:
-    file_path (string): Path of the station file
+	Parameters:
+	file_path (string): Path of the station file
 
-    Returns:
-    dict(string, tuple): Dictionary of station information
+	Returns:
+	dict(string, tuple): Dictionary of station information
 
    """
 	data_dict = {}
@@ -212,15 +265,15 @@ def read_stations(file_path):
 def convert_to_unix_time(year, month, day, hour, minute):
 	"""Converts date and time information to unix time (based on Oslo timezone)
 
-    Parameters:
-    year (int): year
+	Parameters:
+	year (int): year
 	month (int): month
 	day (int): day
 	hour (int): hour
 	minute (int): minute
 
-    Returns:
-    int: Unix time
+	Returns:
+	int: Unix time
 
    """
 	oslo_timezone = pytz.timezone("Europe/Oslo")
@@ -231,11 +284,11 @@ def convert_to_unix_time(year, month, day, hour, minute):
 def convert_norwegian_day_to_date(datestring):
 	"""Converts date and time information to unix time (based on Oslo timezone)
 
-    Parameters:
-    datastring (str): entur formated string describing a date
+	Parameters:
+	datastring (str): entur formated string describing a date
 
-    Returns:
-    str: Date in format %Y-%m-%d
+	Returns:
+	str: Date in format %Y-%m-%d
 
    """
 	weekday_prefixes = ["mandag ", "tirsdag ", "onsdag ", "torsdag ", "fredag ", "lørdag ", "søndag "]
@@ -261,11 +314,11 @@ def convert_norwegian_day_to_date(datestring):
 def connect_database(databasepath):
 	"""Connects to a database and returns a database manager
 
-    Parameters:
-    databasepath (str): path to database
+	Parameters:
+	databasepath (str): path to database
 
-    Returns:
-    DatabaseManager: DatabaseManager
+	Returns:
+	DatabaseManager: DatabaseManager
 
    """
 	db_manager = DatabaseManager(databasepath)
@@ -338,14 +391,19 @@ def main():
 			for conn in day.connections:
 				changed, price = db_manager.insert_price_data(observe_id, conn.departure, conn.price)
 				if changed:
-					print(f"Its cheaper now! New price: {price}")
+					logger.info(f"Its cheaper now! New price: {price}")
 
 		lowest_price = db_manager.get_lowest_price(observe_id)
-		print(f"Cheapest price for id={observe_id} from {row[1]} to {row[2]} on {data_el[0]}-{data_el[1]}-{data_el[2]}:")
-		print(f"{lowest_price[0]} at {lowest_price[2]}")
+		logger.info(f"Cheapest price for id={observe_id} from {row[1]} to {row[2]} on {data_el[0]}-{data_el[1]}-{data_el[2]}:")
+		logger.info(f"{lowest_price[0]} at {lowest_price[2]}")
+
+	if config.get("emailActivated", False)=="True":
+		send_simple_email(config["emailTo"], "Hello World", "Content")
 
 	# Disconnect from the database
 	db_manager.disconnect()
+	logger.debug(f"Database disconnected")
+	logger.info(f"Programme finished successfull")
 
 	
 

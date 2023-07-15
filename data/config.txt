@@ -7,3 +7,5 @@
 # If there are more than one argument, they are comma separated
 debug	True
 transportTypes	tram,water,car_ferry,metro,flytog,flybuss
+emailActivated	True
+emailTo	whatever@gmail.com
