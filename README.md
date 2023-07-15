@@ -24,6 +24,7 @@ This project should be able to get prices of train tickets in Norway and monitor
 
 ## Run
 * install the requirements: ```pip install -r requirements.txt```
+* install ``chromium-browser`` and ``chromedriver``: ``sudo apt-get install chromium-browser`` and ``sudo apt-get install chromium-chromedriver``
 * run programme: ```python3 Enturinator.py```
 * put in the wanted information like date and stations into the main function
 
@@ -40,6 +41,13 @@ This project should be able to get prices of train tickets in Norway and monitor
 
 ## Debug
 There is an example file in the debug folder. Activate ``debug  True`` in the config file such that it is not necessary to download the data every time you test something. This may also prevent you from being IP banned
+
+## Add connections to observe
+To add a connection you want to observe, there are two ways.
+Either run the command ``db_manager.insert_to_observe("Bergen", "Oslo S", "2023-08-06", "2023-08-10", "2023-08-30")`` within the python script (only once!)
+or run the SQL command directly on the database: ``INSERT INTO ToObserve (station_from, station_to, date_observe_start, date_observe_end, observe_until) VALUES ("Bergen", "Oslo S", "2023-08-06", "2023-08-10", "2023-08-30")``
+
+To remove a connection, run a ``DELETE FROM`` command on that SQL table
 
 ## Email
 Create a configuration file at ``data/mailconfig.txt`` in the same way as the other configuration file. It should have the following content:

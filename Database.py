@@ -56,7 +56,15 @@ class DatabaseManager:
 		return self.cursor.lastrowid
 	
 	def insert_price_data(self, observe_id, datetime, price):
-		""" returns true if the price is lower than a previously existing price
+		"""Inserts price information if its new or cheaper. Also returns old price, new price and if it changed
+
+		Parameters:
+		observe_id (int): ID of the connection to check
+		datetime (str): when the train goes
+		price (int): new price
+
+		Returns:
+		tuple(bool, int, int): pricechanged, newPrice, oldPrice
 		"""
 		query = f"SELECT price FROM PriceData WHERE observeID = {observe_id} AND datetime = '{datetime}'"
 		self.cursor.execute(query)
@@ -82,9 +90,14 @@ class DatabaseManager:
 			self.cursor.execute(f"INSERT INTO PriceData (observeID, datetime, price) VALUES ({observe_id}, '{datetime}', {price})")
 
 			self.connection.commit()
-			return False, None
+			return False, None, None
 
 	def get_all_observe_ids(self) -> int:
+		"""Checks the database for the IDs of all connections to be observed
+
+		Returns:
+		List[int]: List of all observeIDs, being IDs of connections to observe
+		"""
 		query = "SELECT DISTINCT id FROM ToObserve;"
 		self.cursor.execute(query)
 
@@ -92,11 +105,27 @@ class DatabaseManager:
 		return unique_ids
 
 	def get_observe_row(self, id: int):
+		"""Returns a single database row in the ToObserve table by its ID
+
+		Parameters:
+		id (int): ID of the connection to check
+
+		Returns:
+		single row
+		"""
 		self.cursor.execute(f"SELECT * FROM ToObserve WHERE id={str(id)}")
 
 		return self.cursor.fetchone()
 
 	def get_lowest_price(self, id: int):
+		"""Returns a single database row of the cheapest connection for one connection ID
+
+		Parameters:
+		id (int): ID of the connection to check
+
+		Returns:
+		single row of the cheapest connection
+		"""
 		self.cursor.execute(f"SELECT MIN(price),id,datetime FROM PriceData WHERE observeID = {str(id)} GROUP BY observeID")
 
 		return self.cursor.fetchone()
