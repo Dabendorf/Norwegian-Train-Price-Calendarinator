@@ -58,3 +58,6 @@ mailaddress	yourmailaddress
 password	yourpassword
 emailTo	receiver
 ```
+
+## Run automatically
+run ``crontab -e`` on your raspberry pi and add this line (remember to alter the paths): ``0 0 * * * /usr/bin/python3 /home/pi/Bots/NorwegianTrainPriceCalendarinator/Enturinator.py >/dev/null 2>&1``
