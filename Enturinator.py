@@ -11,6 +11,35 @@ from Database import DatabaseManager
 import re
 import logging
 
+def read_configuration(config_path="data/config.txt"):
+	"""Reads the preset configuration of the project
+
+    Parameters:
+    config_path (string): Path to the config file, per default data/config.txt
+
+    Returns:
+    string: html content
+
+    """
+	with open(config_path) as config_file:
+		lines = [i.strip() for i in config_file.readlines() if (not i.startswith("#") and len(i.strip()) > 0)]
+
+		config_dict = dict()
+		for line in lines:
+			linesplit = line.split("\t")
+			if len(linesplit) != 2:
+				logging.getLogger("Main").error(f"Wrong config file format in this line:\n{line}")
+				logging.getLogger("Main").error("Programme aborted")
+				exit(0)
+			else:
+				splitarg = linesplit[1].split(",")
+				if len(splitarg) > 1:
+					config_dict[linesplit[0]] = splitarg
+				else:
+					config_dict[linesplit[0]] = linesplit[1]
+		
+		return config_dict
+
 def fetch_website(url):
 	"""Takes any URL and downloads its html content
 
@@ -20,7 +49,7 @@ def fetch_website(url):
     Returns:
     string: html content
 
-   """
+    """
 	options = Options()
 	options.add_argument("--headless")  # Run Chrome in headless mode
 	driver = webdriver.Chrome(options=options)
@@ -46,7 +75,8 @@ def get_transit_container(html_content):
 	if container:
 		return container
 	else:
-		print("Container not found.")
+		logging.getLogger("Main").error(f"Container not found.")
+		logging.getLogger("Main").error("Programme aborted")
 		exit(0)
 
 def get_trains_from_html(html_content):
@@ -137,7 +167,12 @@ def generate_url(date, station_from, station_to):
 		"%2Cflytog",
 		"%2Cflybuss"
 	]
+	global config
+	if "transportTypes" in config:
+		transport_types = "".join([f"%2C{i}" for i in config["transportTypes"]])
+
 	url = f"https://entur.no/reiseresultater?transportModes=rail"+("".join(transport_types))
+	
 	url += f"&date={date}000"	# travel day
 	url += f"&tripMode=oneway"
 	url += f"&walkSpeed=1.3"
@@ -242,12 +277,16 @@ def connect_database(databasepath):
 	return db_manager
 
 def main():
-	logging.basicConfig(format="%(name)s - %(levelname)s - %(message)s", level=logging.INFO) #filename="app.log", filemode="w", 
+	logging.basicConfig(format="%(name)s - %(levelname)s - %(message)s", level=logging.DEBUG) #filename="app.log", filemode="w", 
 	logger = logging.getLogger("Main")
 
-
+	global config
+	config = read_configuration()
+	logger.debug("Read configuration file")
+	logger.debug(f"{config}")
+	
 	# Parameter
-	debug = True
+	debug = config.get("debug", True)=="True"
 	if debug:
 		logger.debug("Debug mode is on")
 
