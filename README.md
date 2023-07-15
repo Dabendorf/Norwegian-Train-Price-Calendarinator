@@ -40,3 +40,13 @@ This project should be able to get prices of train tickets in Norway and monitor
 
 ## Debug
 There is an example file in the debug folder. Activate ``debug  True`` in the config file such that it is not necessary to download the data every time you test something. This may also prevent you from being IP banned
+
+## Email
+Create a configuration file at ``data/mailconfig.txt`` in the same way as the other configuration file. It should have the following content:
+```
+host	smtp.myserver.co.nz
+port	465
+mailaddress	yourmailaddress
+password	yourpassword
+emailTo	receiver
+```

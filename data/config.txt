@@ -8,4 +8,3 @@
 debug	True
 transportTypes	tram,water,car_ferry,metro,flytog,flybuss
 emailActivated	True
-emailTo	whatever@gmail.com

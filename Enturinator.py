@@ -13,31 +13,16 @@ import logging
 import smtplib
 import ssl
 
-def send_simple_email(to, subject, body, config_path="data/emailconfig.txt"):
+def send_simple_email(to, subject, body, mailconfig_dict):
 	"""Sends an email notification
 
 	Parameters:
 	to (string): receiver
 	subject (string): subject
 	body (string): Email content
-	config_path (string): Path to the config file, per default data/config.txt
-	"""
-	with open(config_path) as config_file:
-		lines = [i.strip() for i in config_file.readlines() if (not i.startswith("#") and len(i.strip()) > 0)]
-
-		mailconfig_dict = dict()
-		for line in lines:
-			linesplit = line.split("\t")
-			if len(linesplit) != 2:
-				logging.getLogger("Main").warning(f"Wrong config file format in this line:\n{line}")
-			else:
-				splitarg = linesplit[1].split(",")
-				if len(splitarg) > 1:
-					mailconfig_dict[linesplit[0]] = splitarg
-				else:
-					mailconfig_dict[linesplit[0]] = linesplit[1]
-		
-	if "host" not in mailconfig_dict or "mailaddress" not in mailconfig_dict or "password" not in mailconfig_dict:
+	mailconfig_dict (dict): The dictionary with the email configuration
+	"""		
+	if "host" not in mailconfig_dict or "mailaddress" not in mailconfig_dict or "password" not in mailconfig_dict or "emailTo" not in mailconfig_dict:
 		logging.getLogger("Main").warning(f"Missing argument for email configuration. No email will be send.")
 		logging.getLogger("Main").warning(f"Mail config: {mailconfig_dict}")
 		return
@@ -54,15 +39,38 @@ def send_simple_email(to, subject, body, config_path="data/emailconfig.txt"):
 	#Build your email
 	context = ssl.create_default_context()
 
-	email = f"""Subject: {subject}
-To: {to}
-From: {login}
-{body}"""
+	email = f"Subject: {subject}\nTo: {to}\nFrom: {login}\n{body}"
 
 	#Send email
 	with smtplib.SMTP_SSL(host, port, context=context) as server:
 		server.login(login, password)
 		server.sendmail(login, to, email)
+
+def read_mailconfiguration(config_path="data/emailconfig.txt"):
+	"""Reads the preset email configuration of the project
+
+	Parameters:
+	config_path (string): Path to the config file, per default data/emailconfig.txt
+
+	Returns:
+	string: configuration dictionary
+	"""
+	with open(config_path) as config_file:
+		lines = [i.strip() for i in config_file.readlines() if (not i.startswith("#") and len(i.strip()) > 0)]
+
+		mailconfig_dict = dict()
+		for line in lines:
+			linesplit = line.split("\t")
+			if len(linesplit) != 2:
+				logging.getLogger("Main").warning(f"Wrong config file format in this line:\n{line}")
+			else:
+				splitarg = linesplit[1].split(",")
+				if len(splitarg) > 1:
+					mailconfig_dict[linesplit[0]] = splitarg
+				else:
+					mailconfig_dict[linesplit[0]] = linesplit[1]
+
+	return mailconfig_dict
 
 def read_configuration(config_path="data/config.txt"):
 	"""Reads the preset configuration of the project
@@ -337,6 +345,12 @@ def main():
 	config = read_configuration()
 	logger.debug("Read configuration file")
 	logger.debug(f"{config}")
+
+	mailActivated = config.get("emailActivated", False)=="True"
+	if mailActivated:
+		mailconfig = read_mailconfiguration()
+		logger.debug("Read email configuration file")
+		logger.debug(f"{mailconfig}")
 	
 	# Parameter
 	debug = config.get("debug", True)=="True"
@@ -397,8 +411,8 @@ def main():
 		logger.info(f"Cheapest price for id={observe_id} from {row[1]} to {row[2]} on {data_el[0]}-{data_el[1]}-{data_el[2]}:")
 		logger.info(f"{lowest_price[0]} at {lowest_price[2]}")
 
-	if config.get("emailActivated", False)=="True":
-		send_simple_email(config["emailTo"], "Hello World", "Content")
+	if mailActivated:
+		send_simple_email(mailconfig["emailTo"], "Hello World", "Content", mailconfig)
 
 	# Disconnect from the database
 	db_manager.disconnect()
