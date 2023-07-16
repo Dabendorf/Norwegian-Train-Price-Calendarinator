@@ -13,6 +13,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import smtplib
 import ssl
+import os
 
 def send_simple_email(to, subject, body, mailconfig_dict):
 	"""Sends an email notification
@@ -47,7 +48,7 @@ def send_simple_email(to, subject, body, mailconfig_dict):
 		server.login(login, password)
 		server.sendmail(login, to, email)
 
-def read_mailconfiguration(config_path="data/emailconfig.txt"):
+def read_mailconfiguration(config_path=f"{os.path.abspath(__file__).replace('Enturinator.py','')}data/emailconfig.txt"):
 	"""Reads the preset email configuration of the project
 
 	Parameters:
@@ -73,7 +74,7 @@ def read_mailconfiguration(config_path="data/emailconfig.txt"):
 
 	return mailconfig_dict
 
-def read_configuration(config_path="data/config.txt"):
+def read_configuration(config_path=f"{os.path.abspath(__file__).replace('Enturinator.py','')}data/config.txt"):
 	"""Reads the preset configuration of the project
 
 	Parameters:
@@ -339,11 +340,14 @@ def connect_database(databasepath):
 	return db_manager
 
 def main():
+	# Get absolute path to this
+	path = os.path.abspath(__file__).replace("Enturinator.py","")
+
 	# Logger
 	log_format = "%(name)s - %(asctime)s - %(levelname)s - %(message)s"
 	logging.basicConfig(format=log_format, level=logging.INFO)
 	logger = logging.getLogger("Main")
-	log_handler = TimedRotatingFileHandler("logs/enturbot.log", when="w0", interval=1, backupCount=4)
+	log_handler = TimedRotatingFileHandler(f"{path}logs/enturbot.log", when="w0", interval=1, backupCount=4)
 	
 	formatter = logging.Formatter(log_format)
 	log_handler.setFormatter(formatter)
@@ -368,10 +372,10 @@ def main():
 		logger.debug("Debug mode is on")
 
 	# Read stations
-	station_dict = read_stations("./data/stations.txt")
+	station_dict = read_stations(f"{path}data/stations.txt")
 	logger.debug("Stations read")
 
-	db_manager = connect_database("data/ObservedPrices.db")
+	db_manager = connect_database(f"{path}data/ObservedPrices.db")
 	logger.debug("Database connected")
 
 	#observe_id = db_manager.insert_to_observe("Stavanger", "Oslo S", "2023-07-06", "2023-07-07", "2023-08-30")
@@ -394,7 +398,7 @@ def main():
 		if debug:
 			if observe_id in observe_id_filename_dict:
 				logger.debug("Debug mode: found debug file")
-				content = read_html_file(f"./debug/{observe_id_filename_dict[observe_id]}")
+				content = read_html_file(f"{path}debug/{observe_id_filename_dict[observe_id]}")
 			else:
 				logger.debug("Debug file not found, skip over")
 				continue
@@ -407,7 +411,7 @@ def main():
 		train_data = get_trains_from_html(transit_data)
 		
 		logger.debug(f"Transit container and trains are fetched from html")
-		with open(f"debug/entur_{observe_id}_{data_el[0]}{data_el[1]}{data_el[2]}.html", "w") as file:
+		with open(f"{path}debug/entur_{observe_id}_{data_el[0]}{data_el[1]}{data_el[2]}.html", "w") as file:
 			prettified_content = transit_data.prettify()
 			file.write(prettified_content)
 
