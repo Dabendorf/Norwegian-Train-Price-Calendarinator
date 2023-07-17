@@ -191,7 +191,7 @@ def get_trains_from_html(html_content):
 					logging.getLogger("Main").info(f"Another exception in casting the prices: {price}")
 					continue
 				else:
-					rice = float(findPriceInString[0])
+					price = float(findPriceInString[0])
 			conn = Connection(station_from = station_from, station_to = None, price = price, departure = f" {convert_norwegian_day_to_date(date)} {time_departure}", arrival = time_arrival, duration = duration, legs = [a.strip() for a in aria_label_list[2].split(",")])
 
 			connections.append(conn)
