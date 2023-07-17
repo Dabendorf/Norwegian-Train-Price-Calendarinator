@@ -180,12 +180,18 @@ def get_trains_from_html(html_content):
 			price = connection.find("span", class_="transit-result-item__footer__text").get_text().strip()
 			station_from = connection.find("span", class_="transit-result-item__header__name").get_text().strip()
 
-			if "ikke" in price.lower() or "billetter" in price.lower() or "selges" in price.lower():
+			if "ikke" in price.lower() or "billetter" in price.lower() or "selges" in price.lower() or "utsolgt" in price.lower():
 				if "Billetter selges ikke av Entur".lower() in price.lower() or "Billetter selges deler av reisen".lower():
 					continue
 				price = 2147483647.0
 			else:
-				price = float(re.findall(r'\d+', price)[0])
+				findPriceInString = re.findall(r'\d+', price)
+				if len(findPriceInString) == 0:
+					price = 2147483647.0
+					logging.getLogger("Main").info(f"Another exception in casting the prices: {price}")
+					continue
+				else:
+					rice = float(findPriceInString[0])
 			conn = Connection(station_from = station_from, station_to = None, price = price, departure = f" {convert_norwegian_day_to_date(date)} {time_departure}", arrival = time_arrival, duration = duration, legs = [a.strip() for a in aria_label_list[2].split(",")])
 
 			connections.append(conn)
