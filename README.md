@@ -6,18 +6,18 @@ This project should be able to get prices of train tickets in Norway and monitor
 * get all connections from A to B, including their prices
 * save prices (maybe in a database) and inform about changes
 
-## Todo
+## TODO
 * make it more usable by either an UI or terminal parameter
 * find a better data format
 * currently, it only searches for pricers for adults (voksen); should be able to search others (e.g. student) as well
 * it only informs about cheaper connections, this must not necessarily be the cheapest price of the day
+* database date and queries about events in the past should be ignored/cleaned
+* should use implicite waiting time, cancelling waiting if the website is fully loaded
 
 ## Things to fix
 * Entur relies heavily on a weird URL format which requires for parameter for each station ([label, longitude, latitude, stopID]). Since three of them aren't obvious, there is a dictionary file in ``data/stations.txt`` which has some common stations in it. If yours is missing, add a new line in there. It might be possible to connect this to the station API of entur
 * relies on Google Chrome, maybe find something else (Raspberry Pi friendly)
-* The data only shows information being visible on the main page. Theoretically, there is more information by clicking on each element
-* it ignores the setting about time windows, only asking about the first day
-* daatabase date and queries about events in the past should be ignored/cleaned
+* the programme is terribly slow due to clicking on the boxes for more connections and waiting for it
 
 ## Things to know
 * If there are two trains at the same time on the same day, it does not save information about both connections but only saves the cheaper one of them (treating them both as the same connection)
@@ -36,8 +36,8 @@ This project should be able to get prices of train tickets in Norway and monitor
 * ``debug/`` folder: some html fileswith example data so one does not need to fetch from the website for each run
 
 ## Current data format (to be improved)
-* Connection: ```station_from: string, station_to: string, price: int, departure: string, arrival: string, duration (min): int, description: str, exchanges: int, legs: List[tuple(str, str)]```
-* Travelday: ```connections: List[Connection], date: str```
+* Connection: ``station_from: string, station_to: string, price: int, departure: string, arrival: string, duration (min): int, description: str, exchanges: int, legs: List[tuple(str, str)]``
+* Travelday: ``connections: List[Connection], date: str``
 
 ## Debug
 There is an example file in the debug folder. Activate ``debug  True`` in the config file such that it is not necessary to download the data every time you test something. This may also prevent you from being IP banned

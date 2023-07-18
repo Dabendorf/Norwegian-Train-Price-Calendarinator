@@ -2,6 +2,10 @@ from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 import time
 import datetime
 from datetime import datetime
@@ -103,7 +107,7 @@ def read_configuration(config_path=f"{os.path.abspath(__file__).replace('Enturin
 		
 		return config_dict
 
-def fetch_website(url):
+def fetch_website(url, until_day, waiting_time=10):
 	"""Takes any URL and downloads its html content
 
 	Parameters:
@@ -114,10 +118,25 @@ def fetch_website(url):
 
 	"""
 	options = Options()
-	options.add_argument("--headless")  # Run Chrome in headless mode
+	options.add_argument("--headless")
 	driver = webdriver.Chrome(options=options)
 	driver.get(url)
-	time.sleep(10)  # Wait for 10 seconds
+
+	wait = WebDriverWait(driver, waiting_time)
+
+	button = wait.until(
+		EC.element_to_be_clickable((By.CLASS_NAME, "transit-result__load-more"))
+	)
+
+	while True:
+		try:
+			button.click()
+			wait.until(EC.visibility_of_element_located((By.XPATH, f"//span[@class='travel-list-header__label' and contains(text(), '{until_day}')]")))
+			logging.getLogger("Main").debug("Found last block, continue")
+			break  # Exit the loop if the span element is found
+		except TimeoutException:
+			continue  # Continue clicking the button if the span element is not found within the timeout
+
 	content = driver.page_source
 	driver.quit()
 	return content
@@ -142,7 +161,7 @@ def get_transit_container(html_content):
 		logging.getLogger("Main").error("Programme aborted")
 		exit(0)
 
-def get_trains_from_html(html_content):
+def get_trains_from_html(html_content, until_day=None):
 	"""Takes as argument html content and converts it to proper information about train connections and their prices
 
 	Parameters:
@@ -160,6 +179,9 @@ def get_trains_from_html(html_content):
 		connections = list()
 
 		date = day.find("span", class_="travel-list-header__label").get_text().strip() # the date itself
+		if date.lower() == until_day.lower():
+			logging.getLogger("Main").debug(f"Found final day: {day}")
+			continue
 		
 		connections_ul = day.find("ul")	# container for all connections on this day
 
@@ -173,12 +195,16 @@ def get_trains_from_html(html_content):
 			#for leg in leg_items:
 			#	print(leg)
 			aria_label_list = list(filter(None, connection["aria-label"].replace("Trykk for detaljer", "").replace("Reiseforslaget har et avvik.","").strip().split(".")))
-
-			duration = connection.find("span", class_="transit-result-item__header__duration").get_text().strip()
-			time_departure = connection.find("time", class_="legs-list__leg__time__time").get_text().strip()
-			time_arrival = connection.find("time", class_="trip-pattern-list__time").get_text().strip()
-			price = connection.find("span", class_="transit-result-item__footer__text").get_text().strip()
-			station_from = connection.find("span", class_="transit-result-item__header__name").get_text().strip()
+			
+			try:
+				duration = connection.find("span", class_="transit-result-item__header__duration").get_text().strip()
+				time_departure = connection.find("time", class_="legs-list__leg__time__time").get_text().strip()
+				time_arrival = connection.find("time", class_="trip-pattern-list__time").get_text().strip()
+				price = connection.find("span", class_="transit-result-item__footer__text").get_text().strip()
+				station_from = connection.find("span", class_="transit-result-item__header__name").get_text().strip()
+			except AttributeError as err:
+				logging.getLogger("Main").error(f"Cannot find class {err.with_traceback}")
+				logging.getLogger("Main").error(connection)
 
 			if "ikke" in price.lower() or "billetter" in price.lower() or "selges" in price.lower() or "utsolgt" in price.lower():
 				if "Billetter selges ikke av Entur".lower() in price.lower() or "Billetter selges deler av reisen".lower():
@@ -327,6 +353,30 @@ def convert_norwegian_day_to_date(datestring):
 
 	return formatted_date
 
+def convert_date_to_norwegian_date(datestring):
+	"""Converts %Y-%m-%d string to Entur date format, e.g. Onsdag 26. juli
+
+	Parameters:
+	datastring (str): %Y-%m-%d
+
+	Returns:
+	str: Entur datestring, e.g. Onsdag 26. juli
+	"""
+	date = datetime.strptime(datestring, "%Y-%m-%d")
+
+	month = date.month
+	day = date.day
+	weekday = date.weekday()  # Monday is 0 and Sunday is 6
+
+	weekday_prefixes = ["mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag"]
+	
+	norwegian_month_names = {
+		1: "januar", 2: "februar", 3: "mars", 4: "april",
+		5: "mai", 6: "juni", 7: "juli", 8: "august",
+		9: "september", 10: "oktober", 11: "november", 12: "desember"
+	}
+	return f"{weekday_prefixes[weekday].capitalize()} {day}. {norwegian_month_names[month]}"
+
 def connect_database(databasepath):
 	"""Connects to a database and returns a database manager
 
@@ -401,6 +451,8 @@ def main():
 		row = db_manager.get_observe_row(observe_id)
 		data_el = row[3].split("-")
 
+		until_date = convert_date_to_norwegian_date(row[4])
+
 		if debug:
 			if observe_id in observe_id_filename_dict:
 				logger.debug("Debug mode: found debug file")
@@ -410,11 +462,11 @@ def main():
 				continue
 		else:
 			url = generate_url(date = convert_to_unix_time(int(data_el[0]), int(data_el[1]), int(data_el[2]), 0, 0), station_from=station_dict[row[1]], station_to=station_dict[row[2]])
-			content = fetch_website(url)
+			content = fetch_website(url, until_date)
 
 		# Convert html content to proper information
 		transit_data = get_transit_container(content)
-		train_data = get_trains_from_html(transit_data)
+		train_data = get_trains_from_html(transit_data, until_day=until_date)
 		
 		logger.debug(f"Transit container and trains are fetched from html")
 		with open(f"{path}debug/entur_{observe_id}_{data_el[0]}{data_el[1]}{data_el[2]}.html", "w") as file:
