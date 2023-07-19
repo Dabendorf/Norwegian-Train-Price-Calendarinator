@@ -7,17 +7,13 @@ This project should be able to get prices of train tickets in Norway and monitor
 * save prices (maybe in a database) and inform about changes
 
 ## TODO
-* make it more usable by either an UI or terminal parameter
-* find a better data format
 * currently, it only searches for pricers for adults (voksen); should be able to search others (e.g. student) as well
 * it only informs about cheaper connections, this must not necessarily be the cheapest price of the day
-* database date and queries about events in the past should be ignored/cleaned
-* should use implicite waiting time, cancelling waiting if the website is fully loaded
 
-## Things to fix
+## Things which would be nice
+* make it more usable by either an UI or terminal parameter
 * Entur relies heavily on a weird URL format which requires for parameter for each station ([label, longitude, latitude, stopID]). Since three of them aren't obvious, there is a dictionary file in ``data/stations.txt`` which has some common stations in it. If yours is missing, add a new line in there. It might be possible to connect this to the station API of entur
 * relies on Google Chrome, maybe find something else (Raspberry Pi friendly)
-* the programme is terribly slow due to clicking on the boxes for more connections and waiting for it
 
 ## Things to know
 * If there are two trains at the same time on the same day, it does not save information about both connections but only saves the cheaper one of them (treating them both as the same connection)
@@ -36,7 +32,7 @@ This project should be able to get prices of train tickets in Norway and monitor
 * ``debug/`` folder: some html fileswith example data so one does not need to fetch from the website for each run
 * ``scripts/``: A folder with some scripts to the database for getting current information and adding/deleting observation tasks
 
-## Current data format (to be improved)
+## Data Format
 * Connection: ``station_from: string, station_to: string, price: int, departure: string, arrival: string, duration (min): int, description: str, exchanges: int, legs: List[tuple(str, str)]``
 * Travelday: ``connections: List[Connection], date: str``
 
@@ -44,11 +40,13 @@ This project should be able to get prices of train tickets in Norway and monitor
 There is an example file in the debug folder. Activate ``debug  True`` in the config file such that it is not necessary to download the data every time you test something. This may also prevent you from being IP banned
 
 ## Add connections to observe
-To add a connection you want to observe, there are two ways.
-Either run the command ``db_manager.insert_to_observe("Bergen", "Oslo S", "2023-08-06", "2023-08-10", "2023-08-30")`` within the python script (only once!)
-or run the SQL command directly on the database: ``INSERT INTO ToObserve (station_from, station_to, date_observe_start, date_observe_end, observe_until) VALUES ("Bergen", "Oslo S", "2023-08-06", "2023-08-10", "2023-08-30")``
+To add a connection you want to observe, run the ``insertnewtask.sh`` (5 parameters) script in the script folder
 
-To remove a connection, run a ``DELETE FROM`` command on that SQL table
+To remove a connection, run the ``deletetask.sh`` (1 parameter) file
+```bash
+./insertnewtask.sh "Trondheim" "Bergen" "2023-10-10" "2023-10-11" "2023-09-01"
+./deletetask.sh 4
+```
 
 ## Email
 Create a configuration file at ``data/mailconfig.txt`` in the same way as the other configuration file. It should have the following content:
