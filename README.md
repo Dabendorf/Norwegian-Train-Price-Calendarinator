@@ -26,7 +26,7 @@ This project should be able to get prices of train tickets in Norway and monitor
 * install the requirements: ```pip install -r requirements.txt```
 * install ``chromium-browser`` and ``chromedriver``: ``sudo apt-get install chromium-browser`` and ``sudo apt-get install chromium-chromedriver``
 * run programme: ```python3 Enturinator.py```
-* put in the wanted information like date and stations into the main function
+* add connections to be observed into the database; if you want to use the predefined scripts, make sure to have ``sqlite3`` installed and give the scripts rights to be executed (``chmod +x *.sh``)
 
 ## Project Structure
 * ``Enturinator.py``: main file
@@ -34,6 +34,7 @@ This project should be able to get prices of train tickets in Norway and monitor
 * ``data/config.txt``: contains configuration settings of the project
 * ``data/ObservedPrices.db``: the database containing information about what to observe and historical prices
 * ``debug/`` folder: some html fileswith example data so one does not need to fetch from the website for each run
+* ``scripts/``: A folder with some scripts to the database for getting current information and adding/deleting observation tasks
 
 ## Current data format (to be improved)
 * Connection: ``station_from: string, station_to: string, price: int, departure: string, arrival: string, duration (min): int, description: str, exchanges: int, legs: List[tuple(str, str)]``
