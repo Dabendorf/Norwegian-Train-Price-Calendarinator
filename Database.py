@@ -130,4 +130,17 @@ class DatabaseManager:
 
 		return self.cursor.fetchone()
 
+	def delete_task(self, observe_id, delete_price_data=True):
+		"""Deletes an observation task. Depending on the delete_price_data flag, it also deletes historical data
+
+		Parameters:
+		observe_id (int): ID of the observation task
+		delete_price_data (bool): True if historical price data will be deleted as well
+		"""
+		self.cursor.execute(f"DELETE FROM ToObserve WHERE id={observe_id};")
+
+		if delete_price_data:
+			self.cursor.execute(f"DELETE FROM PriceData WHERE observeID={observe_id};")
+
+		self.connection.commit()
 

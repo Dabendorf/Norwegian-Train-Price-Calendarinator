@@ -124,18 +124,15 @@ def fetch_website(url, until_day, waiting_time=10):
 
 	wait = WebDriverWait(driver, waiting_time)
 
-	button = wait.until(
-		EC.element_to_be_clickable((By.CLASS_NAME, "transit-result__load-more"))
-	)
-
 	while True:
 		try:
-			button.click()
-			wait.until(EC.visibility_of_element_located((By.XPATH, f"//span[@class='travel-list-header__label' and contains(text(), '{until_day}')]")))
-			logging.getLogger("Main").debug("Found last block, continue")
-			break  # Exit the loop if the span element is found
+			wait.until(EC.invisibility_of_element_located((By.XPATH, f"//span[@class='travel-list-header__label' and contains(text(), '{until_day}')]")))
+			wait.until(EC.element_to_be_clickable((By.CLASS_NAME, f"transit-result__load-more"))).click()
+			time.sleep(1)
+			continue # Continue clicking the button if the span element is not found within the timeout
 		except TimeoutException:
-			continue  # Continue clicking the button if the span element is not found within the timeout
+			logging.getLogger("Main").debug("Found the span, break")
+			break
 
 	content = driver.page_source
 	driver.quit()
@@ -433,10 +430,6 @@ def main():
 
 	db_manager = connect_database(f"{path}data/ObservedPrices.db")
 	logger.debug("Database connected")
-
-	#observe_id = db_manager.insert_to_observe("Stavanger", "Oslo S", "2023-07-06", "2023-07-07", "2023-08-30")
-	#observe_id = db_manager.insert_to_observe("Stavanger", "Oslo S", "2023-08-06", "2023-08-10", "2023-08-30")
-	#observe_id = db_manager.insert_to_observe("Bergen", "Oslo S", "2023-08-06", "2023-08-10", "2023-08-30")
 	
 	all_observe_ids = db_manager.get_all_observe_ids()
 	logger.debug(f"IDs to observe: {all_observe_ids}")
@@ -451,8 +444,21 @@ def main():
 		row = db_manager.get_observe_row(observe_id)
 		data_el = row[3].split("-")
 
+		# Upper boundary of time window to observe
 		until_date = convert_date_to_norwegian_date(row[4])
+		observe_until = row[5]
 
+		# Check if until_observe date got surpassed in time => delete event, stopp to observe it
+		if datetime.now().date() > datetime.strptime(observe_until, "%Y-%m-%d").date():
+			logging.getLogger("Main").info(f"Observation task {observe_id} has reached its final observation date ({observe_until}). It will be deleted")
+			db_manager.delete_task(observe_id)
+			continue
+		# Check if today is already within time window, so there there is no need to observe it anymore => delete event, stopp to observe it
+		if datetime.now().date() > datetime.strptime(row[3], "%Y-%m-%d").date():
+			logging.getLogger("Main").info(f"Observation task {observe_id} is in the past ({row[3]}). It will be deleted")
+			db_manager.delete_task(observe_id)
+			continue
+		
 		if debug:
 			if observe_id in observe_id_filename_dict:
 				logger.debug("Debug mode: found debug file")
