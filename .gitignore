@@ -1,5 +1,5 @@
 data/*.db
-debug/*
+#debug/*
 data/emailconfig.txt
 
 # Byte-compiled / optimized / DLL files

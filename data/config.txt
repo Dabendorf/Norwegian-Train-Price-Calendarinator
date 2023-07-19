@@ -5,6 +5,6 @@
 # Every other line consists of two information, separated by a tab (tab != 4spaces)
 # The left is the name of the setting, the right is the content
 # If there are more than one argument, they are comma separated
-debug	True
+debug	False
 transportTypes	tram,water,car_ferry,metro,flytog,flybuss
-emailActivated	True
+emailActivated	False

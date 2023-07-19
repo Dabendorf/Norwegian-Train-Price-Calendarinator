@@ -29,7 +29,6 @@ This project should be able to get prices of train tickets in Norway and monitor
 * ``data/station.txt``: information about stations
 * ``data/config.txt``: contains configuration settings of the project
 * ``data/ObservedPrices.db``: the database containing information about what to observe and historical prices
-* ``debug/`` folder: some html fileswith example data so one does not need to fetch from the website for each run
 * ``scripts/``: A folder with some scripts to the database for getting current information and adding/deleting observation tasks
 
 ## Data Format
