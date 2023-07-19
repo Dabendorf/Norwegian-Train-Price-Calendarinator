@@ -4,7 +4,7 @@ This project aims to generate a pricing calendar for Norwegian train connections
 ## Goals
 This project should be able to get prices of train tickets in Norway and monitor changes of these prices
 * get all connections from A to B, including their prices
-* save prices (maybe in a database) and inform about changes
+* save prices and inform about changes via email
 
 ## TODO
 * currently, it only searches for pricers for adults (voksen); should be able to search others (e.g. student) as well
